@@ -48,26 +48,45 @@ MIN
 ;out R0
 MUL
 ;your code goes here
-	
+	ST R3, MUL_SaveR3	;save R3
+	ST R4, MUL_SaveR4	;save R4
+	ST R7, MUL_SaveR4	;save R7
 JSR POP
+AND R3, R3, 0 ;	init R3
 ADD R3, R0, R3 ; get first operand
 JSR POP
+AND R4, R4, 0 ; init R4
 ADD R4, R0, R4 ; get second operand
 MULTLOOP	ADD R3, R3, R3 ; add R3 to itself
 		ADD R4, R4, -1 ; R4--
 		BRp MULTLOOP
 		AND R0, R0, 0 ; clear R0
 		ADD R0, R0, R3 ; put output in R0
-		
+		LD R3, MUL_SaveR3
+		LD R4, MUL_SaveR4
+		LD R7, MUL_SaveR7
+		RET
 
+MUL_SaveR3	.BLKW #1
+MUL_SaveR4	.BLKW #1
+MUL_SaveR7	.BLKW #1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;input R3, R4
 ;out R0
 ;DIV	
 ;your code goes here
+	ST R3, DIV_SaveR3
+	ST R4, DIV_SaveR4
+	ST R7, DIV_SaveR7
+JSR POP
+ADD R3, R0, R3 ; get first operand
+JSR POP
+ADD R4, R0, R4 ; get second operand	
+	
 
-	
-	
+DIV_SaveR3	.BLKW #1
+DIV_SaveR4	.BLKW #1
+DIV_SaveR7	.BLKW #1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;input R3, R4
 ;out R0
