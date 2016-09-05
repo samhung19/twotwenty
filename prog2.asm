@@ -78,10 +78,23 @@ MUL_SaveR7	.BLKW #1
 	ST R3, DIV_SaveR3
 	ST R4, DIV_SaveR4
 	ST R7, DIV_SaveR7
-JSR POP
-ADD R3, R0, R3 ; get first operand
-JSR POP
-ADD R4, R0, R4 ; get second operand	
+	JSR POP
+	AND R3, R3, 0 ;	init R3
+	ADD R3, R0, R3 ; get first operand
+	JSR POP
+	AND R4, R4, 0 ; init R4
+	ADD R4, R0, R4 ; get second operand
+	AND R0, R0, 0  ; clear R0
+	NOT R4, R4 
+	ADD R4, R4, 1  ; get inverse of R4
+DIVLOOP	ADD R3, R3, R4 ; subtract R4 from R3
+	ADD R0, R0, 1  
+	AND R3. R3. R3
+	BRp DIVLOOP
+	LD R3, DIV_SaveR3
+	LD R4, DIV_SaveR4
+	LD R7, DIV_SaveR7
+	RET
 	
 
 DIV_SaveR3	.BLKW #1
