@@ -138,6 +138,40 @@ DIV_SaveR7	.BLKW #1
 ;out R0
 ;EXP
 ;your code goes here
+
+	ST R3, EXP_SaveR3
+	ST R4, EXP_SaveR4
+	ST R7, EXP_SaveR7
+	JSR POP
+	AND R3, R3, 0 ;	init R3
+	ADD R3, R0, R3 ; get first operand
+	JSR POP
+	AND R4, R4, 0 ; init R4
+	ADD R4, R0, R4 ; get second operand
+
+AND R0, R0, 0
+AND R1, R1, 0
+AND R2, R2, 0
+ADD R4, R4, 0
+BRz ZEROPOW ; if R4 (power) is zero
+
+INNERLOOP	ADD R1, R1, R3 ; set R1 to R3
+		ADD R5, R5, R3 ; R5 will be product
+		ADD R1, R1, -1 ; decrement R1
+		BRp INNERLOOP
+OUTERLOOP	AND R0, R0, R5 
+		ADD R2, R2, -1
+		BRp OUTERLOOP
+		BRnzp FINISH
+
+ZEROPOW	AND R0, R0, 0
+	ADD R0, R0, 1 ; sets result to 1 because anything to 0 power is 1
+
+FINISH	RET
+
+EXP_SaveR3	.BLKW #1
+EXP_SaveR4	.BLKW #1
+EXP_SaveR7	.BLKW #1
 	
 ;IN:R0, OUT:R5 (0-success, 1-fail/overflow)
 ;R3: STACK_END R4: STACK_TOP
