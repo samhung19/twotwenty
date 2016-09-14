@@ -9,6 +9,9 @@
 
 
 
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;R3- value to print in hexadecimal
 PRINT_HEX
@@ -28,13 +31,50 @@ EVALUATE
 ;out R0
 PLUS	
 ;your code goes here
-	
+	ST R3, PLUS_SaveR3
+	ST R4, PLUS_SaveR4
+	ST R7, PLUS_SaveR7
+JSR POP
+AND R3, R3, 0 ;	init R3
+ADD R3, R0, R3 ; get first operand
+JSR POP
+AND R4, R4, 0 ; init R4
+ADD R4, R0, R4 ; get second operand
+AND R0, R0, 0 ; clear R0
+ADD R0, R3, R4
+	LD R3, PLUS_SaveR3
+	LD R4, PLUS_SaveR4
+	LD R7, PLUS_SaveR7
+
+PLUS_SaveR3	.BLKW #1
+PLUS_SaveR4	.BLKW #1
+PLUS_SaveR7	.BLKW #1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;input R3, R4
 ;out R0
 MIN	
 ;your code goes here
-	
+	ST R3, MIN_SaveR3
+	ST R4, MIN_SaveR4
+	ST R7, MIN_SaveR7
+JSR POP
+AND R3, R3, 0 ;	init R3
+ADD R3, R0, R3 ; get first operand
+JSR POP
+AND R4, R4, 0 ; init R4
+ADD R4, R0, R4 ; get second operand
+AND R0, R0, 0 ; clear R0
+NOT R4, R4
+ADD R4, R4, 1 ; get negative R4
+ADD R0, R3, R4 ; 
+	LD R3, MIN_SaveR3
+	LD R4, MIN_SaveR4
+	LD R7, MIN_SaveR7
+RET
+
+MIN_SaveR3	.BLKW #1
+MIN_SaveR4	.BLKW #1
+MIN_SaveR7	.BLKW #1	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;input R3, R4
 ;out R0
@@ -65,7 +105,7 @@ MUL_SaveR7	.BLKW #1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;input R3, R4
 ;out R0
-;DIV	
+DIV	
 ;your code goes here
 	ST R3, DIV_SaveR3
 	ST R4, DIV_SaveR4
@@ -77,6 +117,7 @@ MUL_SaveR7	.BLKW #1
 	AND R4, R4, 0 ; init R4
 	ADD R4, R0, R4 ; get second operand
 	AND R0, R0, 0  ; clear R0
+	ADD R0, R0, -1 ; set R0 to -1
 	NOT R4, R4 
 	ADD R4, R4, 1  ; get inverse of R4
 DIVLOOP	ADD R3, R3, R4 ; subtract R4 from R3
@@ -87,6 +128,7 @@ DIVLOOP	ADD R3, R3, R4 ; subtract R4 from R3
 	LD R4, DIV_SaveR4
 	LD R7, DIV_SaveR7
 	RET
+	
 
 DIV_SaveR3	.BLKW #1
 DIV_SaveR4	.BLKW #1
