@@ -16,6 +16,56 @@
 ;R3- value to print in hexadecimal
 PRINT_HEX
 
+;R1 acts as the digit counter (4 digits inside R3)
+;R2 acts as the bit counter (4 bits per digit)
+AND R1, R1, 0  ; initialize R1, clear and set to 4
+ADD R1, R1, #4
+
+OUTER	AND R2, R2, 0  ; initialize R2, clear and set to 4
+	ADD R2, R2, #4
+	AND R0, R0, 0  ; make sure to clear R0
+	
+	
+LOOP	ADD R3, R3, 0 ; select R3
+	BRzp POS
+ NEG	ADD R4, R4, R4 ; r4 = r4 + r4 //shift left
+	ADD R4, R4, #1   ; r4++
+	ADD R3, R3, R3 ; r3 = r3 + r3 //shift left
+	ADD R2, R2, #-1 ; r2--
+	BRp LOOP  ; if r2 is still positive, go back to loop
+	BRnzp ARFIVE
+
+POS	ADD R4, R4, R4 ; r4 = r4 + r4
+	ADD R3, R3, R3 ; r3 = r3 + r3 //shift left
+ADD R2, R2, #-1 ; r2--
+	BRp LOOP 
+
+ARFIVE	AND R5, R5, 0 ; initialize R5
+ADD R5, R5, R4 ;copy R4 into R5
+ADD R5, R5, #-9 ; subtract R5 by 9
+BRp  FIFTYFIVE ; if positive, then ALPHA --- if negative, them NUM
+ADD R4, R4, #12
+ADD R4, R4, #12
+ADD R4, R4, #12
+ADD R4, R4, #12 ;by this point, R4 should be fully converted
+BRnzp PRINT
+
+FIFTYFIVE	ADD R4, R4, #11
+		ADD R4, R4, #11
+		ADD R4, R4, #11
+		ADD R4, R4, #11
+		ADD R4, R4, #11 ;by this point, R4 should be fully converted
+		BRnzp PRINT
+
+PRINT	ADD R0, R0, R4 ;copy R4 into R0
+AND R4, R4, 0 ; clear R4
+TRAP x21
+ADD R1, R1, #-1
+BRp OUTER
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;R0 - character input from keyboard
 ;R6 - current numerical output
@@ -165,7 +215,7 @@ OUTERLOOP	AND R0, R0, R5
 		BRnzp FINISH
 
 ZEROPOW	AND R0, R0, 0
-	ADD R0, R0, 1 ; sets result to 1 because anything to 0 power is 1
+	ADD R0, R0, 1
 
 FINISH	RET
 
