@@ -9,14 +9,6 @@
 
 
 
-
-
-
-
-
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;R3- value to print in hexadecimal
 PRINT_HEX
@@ -95,7 +87,6 @@ DIVLOOP	ADD R3, R3, R4 ; subtract R4 from R3
 	LD R4, DIV_SaveR4
 	LD R7, DIV_SaveR7
 	RET
-	
 
 DIV_SaveR3	.BLKW #1
 DIV_SaveR4	.BLKW #1
