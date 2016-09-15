@@ -8,8 +8,8 @@
 	
 
 GET_CHAR
-	AND R0, R0, #0
-	GETC
+	AND R0, R0, 0
+	GETC ; get input from the user
 	OUT ; echo
 	LD R1, SPACE
 	NOT R1, R1
@@ -17,37 +17,52 @@ GET_CHAR
 	ADD R1, R0, R1 ; 
 	BRz GET_CHAR ; if space
 
-	; check operators
+CHECKPLUS	; check operators
 	LD R1, PLUSSIGN
 	NOT R1, R1
 	ADD R1, R1, 1 ; basically multiplies R1 by -1
 	ADD R1, R0, R1 ; 
+	BRnp CHECKMIN 
 	JSR PLUS
+	BRnzp GET_CHAR
 
+CHECKMIN	
 	LD R1, MINUSSIGN
 	NOT R1, R1
 	ADD R1, R1, 1 ; basically multiplies R1 by -1
-	ADD R1, R0, R1 ; 
+	ADD R1, R0, R1 ;
+	BRnp CHECKMUL 
 	JSR MIN
+	BRnzp GET_CHAR
 
+CHECKMUL	
 	LD R1, MULTSIGN
 	NOT R1, R1
 	ADD R1, R1, 1 ; basically multiplies R1 by -1
 	ADD R1, R0, R1 ; 
+	BRnp CHECKDIV
 	JSR MUL
+	BRnzp GET_CHAR
 
+CHECKDIV
 	LD R1, DIVSIGN
 	NOT R1, R1
 	ADD R1, R1, 1 ; basically multiplies R1 by -1
 	ADD R1, R0, R1 ; 
+	BRnp CHECKPOW
 	JSR DIV
+	BRnzp GET_CHAR
 	
+CHECKPOW
 	LD R1, POWSIGN
 	NOT R1, R1
 	ADD R1, R1, 1 ; basically multiplies R1 by -1
 	ADD R1, R0, R1 ; 
+	BRnp CHECKNUM 
 	JSR EXP
+	BRnzp GET_CHAR
 
+CHECKNUM
 	; check to see if num
 	AND R1, R1, 0 ; clear R1
 	ADD R1, R1, #-12
@@ -169,6 +184,7 @@ ADD R0, R3, R4
 	LD R3, PLUS_SaveR3
 	LD R4, PLUS_SaveR4
 	LD R7, PLUS_SaveR7
+
 RET
 
 PLUS_SaveR3	.BLKW #1
