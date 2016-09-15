@@ -8,8 +8,8 @@
 	
 
 GET_CHAR
-	AND R0, R0, 0
-	GETC ; get input from the user
+	AND R0, R0, #0
+	GETC
 	OUT ; echo
 	LD R1, SPACE
 	NOT R1, R1
@@ -169,6 +169,7 @@ ADD R0, R3, R4
 	LD R3, PLUS_SaveR3
 	LD R4, PLUS_SaveR4
 	LD R7, PLUS_SaveR7
+RET
 
 PLUS_SaveR3	.BLKW #1
 PLUS_SaveR4	.BLKW #1
@@ -206,7 +207,7 @@ MUL
 ;your code goes here
 	ST R3, MUL_SaveR3	;save R3
 	ST R4, MUL_SaveR4	;save R4
-	ST R7, MUL_SaveR4	;save R7
+	ST R7, MUL_SaveR7	;save R7
 JSR POP
 AND R3, R3, 0 ;	init R3
 ADD R3, R0, R3 ; get first operand
@@ -364,7 +365,7 @@ MULTSIGN	.FILL x002A
 DIVSIGN		.FILL x002F
 POWSIGN		.FILL x005E
 
-INV_EX		.STRINGZ "Invalid Expression."
+INV_EX		.STRINGZ "Invalid Expression"
 
 
 
