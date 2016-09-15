@@ -7,7 +7,73 @@
 ;your code goes here
 	
 
+GET_CHAR
+	AND R0, R0, 0
+	GETC ; get input from the user
+	OUT ; echo
+	LD R1, SPACE
+	NOT R1, R1
+	ADD R1, R1, 1 ; basically multiplies R1 by -1
+	ADD R1, R0, R1 ; 
+	BRz GET_CHAR ; if space
 
+	; check operators
+	LD R1, PLUSSIGN
+	NOT R1, R1
+	ADD R1, R1, 1 ; basically multiplies R1 by -1
+	ADD R1, R0, R1 ; 
+	JSR PLUS
+
+	LD R1, MINUSSIGN
+	NOT R1, R1
+	ADD R1, R1, 1 ; basically multiplies R1 by -1
+	ADD R1, R0, R1 ; 
+	JSR MIN
+
+	LD R1, MULTSIGN
+	NOT R1, R1
+	ADD R1, R1, 1 ; basically multiplies R1 by -1
+	ADD R1, R0, R1 ; 
+	JSR MUL
+
+	LD R1, DIVSIGN
+	NOT R1, R1
+	ADD R1, R1, 1 ; basically multiplies R1 by -1
+	ADD R1, R0, R1 ; 
+	JSR DIV
+	
+	LD R1, POWSIGN
+	NOT R1, R1
+	ADD R1, R1, 1 ; basically multiplies R1 by -1
+	ADD R1, R0, R1 ; 
+	JSR EXP
+
+	; check to see if num
+	AND R1, R1, 0 ; clear R1
+	ADD R1, R1, #-12
+	ADD R1, R1, #-12
+	ADD R1, R1, #-12
+	ADD R1, R1, #-12
+	ADD R1, R0, R1
+	BRn INVALID	; if ascii val is less than 48, it is invalid
+	AND R1, R1, 0
+	ADD R1, R1, #-11
+	ADD R1, R1, #-11
+	ADD R1, R1, #-11
+	ADD R1, R1, #-11
+	ADD R1, R1, #-13
+	ADD R1, R0, R1
+	BRnz ISNUM ; if satisfies both, then it is a num
+	BRnzp INVALID ; if anything else, it is invalid
+	; end num check
+
+ISNUM	JSR PUSH
+	BRnzp GET_CHAR
+	
+;check to see if operand or operator
+;if operator, then push to stack
+; ascii numbers: 48-57
+; ascii operators: 42*  43+   45-   94^
 
 
 
@@ -18,6 +84,8 @@ PRINT_HEX
 
 ;R1 acts as the digit counter (4 digits inside R3)
 ;R2 acts as the bit counter (4 bits per digit)
+AND R3, R3, 0
+ADD R3, R3, R0 ; put R0 into R3
 AND R1, R1, 0  ; initialize R1, clear and set to 4
 ADD R1, R1, #4
 
@@ -68,12 +136,18 @@ BRp OUTER
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;R0 - character input from keyboard
-;R6 - current numerical output
+;R5 - current numerical output
 ;
 ;
 EVALUATE
 
 ;your code goes here
+
+
+INVALID	AND R0, R0, 0
+	LEA R0, INV_EX
+	OUT
+	HALT
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -172,7 +246,7 @@ DIV
 	ADD R4, R4, 1  ; get inverse of R4
 DIVLOOP	ADD R3, R3, R4 ; subtract R4 from R3
 	ADD R0, R0, 1  
-	AND R3. R3. R3
+	AND R3, R3, R3
 	BRp DIVLOOP
 	LD R3, DIV_SaveR3
 	LD R4, DIV_SaveR4
@@ -186,7 +260,7 @@ DIV_SaveR7	.BLKW #1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;input R3, R4
 ;out R0
-;EXP
+EXP
 ;your code goes here
 
 	ST R3, EXP_SaveR3
@@ -283,6 +357,15 @@ POP_SaveR4	.BLKW #1	;
 STACK_END	.FILL x3FF0	;
 STACK_START	.FILL x4000	;
 STACK_TOP	.FILL x4000	;
+SPACE		.FILL x0020
+PLUSSIGN	.FILL x002B
+MINUSSIGN	.FILL x002D
+MULTSIGN	.FILL x002A
+DIVSIGN		.FILL x002F
+POWSIGN		.FILL x005E
+
+INV_EX		.STRINGZ "Invalid Expression."
+
 
 
 .END
