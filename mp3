@@ -5,7 +5,7 @@
 //ask user for 3 inputs
 //the three inputs are omegas (frequencies)
 //using these three frequencies, print out values for voltage (out)
-//the equation is a differential one, so we gotta use v [n+1], v[n] and v[n-1] 
+//the equation is a differential one, so we gotta use v [n+1], v[n] and v[n-1]
 
 int main()
 {
@@ -14,15 +14,15 @@ int main()
 	//double pi = 3.141592654;
     //double x;
 	//Scan the inputs from the user.
-	printf("Please enter omega1, omega2, and omegac below: \n");
+	//printf("Please enter omega1, omega2, and omegac below: \n");
 	scanf("%lf %lf %lf", &omega1, &omega2, &omegac);
 
-	T = (double)3 * (double)2 * M_PI / omega1;      // Total time
-    	N = (double)20 * T / ((double)2 * M_PI / omega2);   // Total number of time steps
+	T = 3 * 2 * M_PI / omega1;      // Total time
+    	N = 20 * T / (2 * M_PI / omega2);   // Total number of time steps
     	dt = T / N;             // Time step
     //double vin;
 	int i;
-	double Voutnew = 0, Voutcur = 0, Voutprev = 0;
+	double Voutnew, Voutcur = 0, Voutprev = 0;
 	double eq_pt1, eq_pt2, eq_pt3, eq_pt4;
 
 
@@ -34,15 +34,16 @@ for (i = 0; i< N; i++){
     //vin = sin(omega1*x) + .5*sin(omega2*x); //in case we ever need this later
     eq_pt1 = (1/((1/(sqrt(2)*dt*omegac))+(1/(dt*dt*omegac*omegac)))); //splitting this into chunks
     eq_pt2 = ((2/(dt*dt*omegac*omegac))-1)*Voutcur;
-    eq_pt3 = (1/(sqrt(2)*dt*omegac))-(1/(dt*dt*omegac*omegac))*Voutprev;
+    eq_pt3 = ((1/(sqrt(2)*dt*omegac))-(1/(dt*dt*omegac*omegac)))*Voutprev;
     eq_pt4 = sin(omega1*(double)i*dt) + .5*sin(omega2*(double)i*dt);
     Voutnew = eq_pt1 * (eq_pt2 + eq_pt3 + eq_pt4);
 
-if (i == 0){
+/*if (i == 0){
 Voutprev = 0;
 Voutcur = 0;
 Voutnew = eq_pt1 * eq_pt4;
 }
+*/
  printf("%lf\n", Voutcur);
     Voutprev = Voutcur;
     Voutcur = Voutnew;
