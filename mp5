@@ -2,7 +2,7 @@
 
 shung5
 ece220
-lab5 v1.1
+lab5 v1.2
 best_class_ever_:D
 
 -----____intro____-----
@@ -75,16 +75,16 @@ set_seed (const char seed_str[])
 int seed;
 int seed_success = 1;
 char post[2] = "";
-sscanf (seed_str, "%d%1s", &seed, post);
+sscanf (seed_str, "%d%s", &seed, post);
 if (seed < 0){   //program will return -2 (on my computer) if the seed doesnt exist
     printf("set_seed: invalid seed\n");
     return 0;   //if true, then return zero
 }
-if (sscanf (seed_str, "%d%1s", &seed, post)==0){ //in case the first check doesnt work out
+if (sscanf (seed_str, "%d%s", &seed, post)==0){ //in case the first check doesnt work out
 printf("set_seed: invalid seed\n");
     return 0;
 }
-if (sscanf (seed_str, "%d%1s", &seed, post)==2){ //check for anything after the integer
+if (sscanf (seed_str, "%d%s", &seed, post)==2){ //check for anything after the integer
 printf("set_seed: invalid seed\n");
     return 2;
 }
@@ -117,7 +117,7 @@ start_game (int* one, int* two, int* three, int* four)
 *two = rand()%8;
 *three = rand()%8;
 *four = rand()%8;
-printf("%d %d %d %d ", *one, *two, *three, *four);
+printf("%d %d %d %d \n", *one, *two, *three, *four); //print out solution
 guess_number = 1;
 solution1 = *one;
 solution2 = *two;
@@ -175,11 +175,15 @@ int solution3temp = 9;
 int solution4temp = 9;
 int perfect = 0;
 int misplaced = 0;
-sscanf(guess_str, "%d%d%d%d%ls", &w, &x, &y, &z, post);
+sscanf(guess_str, "%d%d%d%d%s", &w, &x, &y, &z, post);
 
 //now check to see if guess_str was properly formatted
 //if formatted wrong, return 0 and print error message
-if (sscanf(guess_str, "%d%d%d%d%ls", &w, &x, &y, &z, post)!=4){ //if any of the guess ints are zero (u can't have zero as a guess), then return 0
+if (sscanf(guess_str, "%d%d%d%d%s", &w, &x, &y, &z, post)!=4){ //if any of the guess ints are zero (u can't have zero as a guess), then return 0
+printf("make_guess: invalid guess\n");
+return 0;
+}
+if ( w > 7 || x > 7 || y > 8 || z > 9){
 printf("make_guess: invalid guess\n");
 return 0;
 }
@@ -187,10 +191,10 @@ return 0;
 *two = x;
 *three = y;
 *four = z;
-solution1temp = w;
-solution2temp = x;
-solution3temp = y;
-solution4temp = z;
+solution1temp = solution1;
+solution2temp = solution2;
+solution3temp = solution3;
+solution4temp = solution4;
 if (*one == solution1temp){
     perfect++;
     solution1temp = 9;
