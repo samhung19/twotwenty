@@ -2,7 +2,7 @@
 
 shung5
 ece220
-lab5 v1.2
+lab5 v1.4
 best_class_ever_:D
 
 -----____intro____-----
@@ -84,9 +84,9 @@ if (sscanf (seed_str, "%d%s", &seed, post)==0){ //in case the first check doesnt
 printf("set_seed: invalid seed\n");
     return 0;
 }
-if (sscanf (seed_str, "%d%s", &seed, post)==2){ //check for anything after the integer
+if (sscanf (seed_str, "%d%s", &seed, post)!=1){ //check for anything after the integer
 printf("set_seed: invalid seed\n");
-    return 2;
+    return 0;
 }
 
     srand(seed);
@@ -117,7 +117,7 @@ start_game (int* one, int* two, int* three, int* four)
 *two = rand()%8;
 *three = rand()%8;
 *four = rand()%8;
-printf("%d %d %d %d \n", *one, *two, *three, *four); //print out solution
+//printf("%d %d %d %d \n", *one, *two, *three, *four);
 guess_number = 1;
 solution1 = *one;
 solution2 = *two;
@@ -183,7 +183,7 @@ if (sscanf(guess_str, "%d%d%d%d%s", &w, &x, &y, &z, post)!=4){ //if any of the g
 printf("make_guess: invalid guess\n");
 return 0;
 }
-if ( w > 7 || x > 7 || y > 8 || z > 9){
+if ( w > 7 || x > 7 || y > 7 || z > 7 || w < 0 || x < 0 || y < 0 || z < 0){
 printf("make_guess: invalid guess\n");
 return 0;
 }
@@ -195,30 +195,34 @@ solution1temp = solution1;
 solution2temp = solution2;
 solution3temp = solution3;
 solution4temp = solution4;
-if (*one == solution1temp){
+if (*one == solution1){
     perfect++;
     solution1temp = 9;
 }
-if (*two == solution2temp){
+if (*two == solution2){
     perfect++;
     solution2temp = 9;
 }
-if (*three == solution3temp){
+if (*three == solution3){
     perfect++;
     solution3temp = 9;
 }
-if (*four == solution4temp){
+if (*four == solution4){
     perfect++;
     solution4temp = 9;
 }
-if (*one != solution1temp){ //check for misplaced in guess[0]
+ if (*one == solution1){
+	status++;
+			  }
+if (*one != solution1){ //check for misplaced in guess[0]
+   
     if (*one == solution2temp && status == 1){
-    solution2temp = 9;
+    solution2temp = 10;
     status++;
     misplaced++;
     }
     if (*one == solution3temp && status == 1){
-    solution3temp = 9;
+    solution3temp = 8;
     status++;
     misplaced++;
     }
@@ -231,19 +235,23 @@ if (*one != solution1temp){ //check for misplaced in guess[0]
         status++;
     }
 }
-if (*two != solution2temp){ //check for misplaced in guess[1]
+ if (*two == solution2){
+	status++;
+			  }
+if (*two != solution2){ //check for misplaced in guess[1]
+     
     if (*two == solution1temp && status == 2){
-    solution1temp = 9;
+    solution1temp = 17;
     status++;
     misplaced++;
     }
     if (*two == solution3temp && status == 2){
-    solution3temp = 9;
+    solution3temp = 18;
     status++;
     misplaced++;
     }
     if (*two == solution4temp && status == 2){
-    solution4temp = 9;
+    solution4temp = 19;
     status++;
     misplaced++;
     }
@@ -251,19 +259,24 @@ if (*two != solution2temp){ //check for misplaced in guess[1]
         status++;
     }
 }
-if (*three != solution3temp){
+	  if (*three == solution3){
+	status++;
+			  }
+if (*three != solution3){
+	
+
     if (*three == solution1temp && status == 3){
-        solution1temp = 9;
+        solution1temp = 27;
         status++;
         misplaced++;
     }
     if (*three == solution2temp && status == 3){
-        solution2temp = 9;
+        solution2temp = 28;
         status++;
         misplaced++;
     }
     if (*three == solution4temp && status == 3){
-        solution4temp = 9;
+        solution4temp = 29;
         status++;
         misplaced++;
     }
@@ -271,19 +284,24 @@ if (*three != solution3temp){
         status++;
     }
 }
-if (*four != solution4temp){
+  if (*four == solution4){
+	status++;
+			  }
+if (*four != solution4){
+	
+
     if (*four == solution1temp && status == 4){
-    solution1temp = 9;
+    solution1temp = 37;
     status++;
     misplaced++;
     }
     if (*four == solution2temp && status == 4){
-        solution2temp = 9;
+        solution2temp = 38;
         status++;
         misplaced++;
     }
     if (*four == solution3temp && status == 4){
-        solution3temp = 9;
+        solution3temp = 39;
         status++;
         misplaced++;
     }
@@ -294,6 +312,9 @@ solution1temp = solution1;
 solution2temp = solution2;
 solution3temp = solution3;
 solution4temp = solution4;
+//printf(" w is %d, x is %d, y is %d, z is %d\n", w, x, y, z); //test
+//printf("sol1: %d, sol2 %d, sol3: %d, sol4 %d\n", solution1, solution2, solution3, solution4);
+//printf("starone is %d\n", *one);
 printf("With guess %d, you got %d perfect matches and %d misplaced matches.\n", guess_number, perfect, misplaced);
 guess_number++;
     return 1;
