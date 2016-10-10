@@ -1,0 +1,156 @@
+/*
+ *
+ shung5
+ ece220
+ mp6
+ version 0.0
+
+
+
+
+ countLiveNeighbor
+ * Inputs:
+ * board: 1-D array of the current game board. 1 represents a live cell.
+ * 0 represents a dead cell
+ * boardRowSize: the number of rows on the game board.
+ * boardColSize: the number of cols on the game board.
+ * row: the row of the cell that needs to count alive neighbors.
+ * col: the col of the cell that needs to count alive neighbors.
+ * Output:
+ * return the number of alive neighbors. There are at most eight neighbors.
+ * Pay attention for the edge and corner cells, they have less neighbors.
+ */
+
+int countLiveNeighbor(int* board, int boardRowSize, int boardColSize, int row, int col){
+int endindex = boardRowSize * boardColSize - 1; //remember that rows and column indexes start at 0
+int totalalive = 0;
+int currentpos = row * boardColSize + col;
+int north, south, east, west, northeast, northwest, southeast, southwest; //these are the eight possible neighbors
+
+//check north buddy
+north = currentpos - rowsize;
+if (north >= 0){ //check to see if north neighbor exists
+    if (board[north]==1){
+        totalalive++;
+    }
+}
+//check south buddy
+south = currentpos + rowsize;
+if (south <= endindex){ //this must be true in order for us to check the following conditional
+    if (board[south]==1){ //above must be true in order for this case
+        totalalive++;
+    }
+}
+//check east buddy
+east = currentpos + 1
+if (east <= endindex){
+    if (currentpos%rowsize != (rowsize-1) && board[east] == 1){ //check to see if the current cell is a right edge cell
+        totalalive++;
+         }
+}
+//check west buddy
+west = currentpos - 1;
+if (west >= 0){
+    if (currentpos%rowsize!=0 && board[west]==1){ //check to see if the current cell is left edge cell
+        totalalive++;
+            }
+}
+//check northeast buddy
+northeast = currentpos - (rowsize -1);
+if (northeast >= 0){ //if in range
+    if (currentpos%rowsize!=(rowsize - 1) && board[northeast]==1){ //check to see if right edge cell
+            totalalive++;
+        }
+}
+//check northwest buddy
+northwest = currentpos - (rowsize + 1);
+if (northwest >= 0){
+    if (currentpos%rowsize!=0 && board[northwest]==1){
+            totalalive++;
+        }
+    }
+//check southeast buddy
+southeast = currentpos + (rowsize + 1);
+if (southeast <= endindex){
+    if (currentpos%rowsize != (rowsize - 1) && board[southeast]==1){ //check for right edge cell
+           totalalive++;
+        }
+
+}
+//check southwest buddy
+southwest = currentpos + (rowsize-1);
+if (southwest <= endindex){
+    if (currentpos%rowsize!=0 && board[southwest]==1){
+            totalalive++;
+        }
+    }
+
+return totalalive;
+}
+
+
+
+/*
+ * Update the game board to the next step.
+ * Input:
+ * board: 1-D array of the current game board. 1 represents a live cell.
+ * 0 represents a dead cell
+ * boardRowSize: the number of rows on the game board.
+ * boardColSize: the number of cols on the game board.
+ * Output: board is updated with new values for next step.
+ */
+void updateBoard(int* board, int boardRowSize, int boardColSize) {
+int i, j;
+int k = 0;
+
+for (int i = 0; i < boardColSize; i++){ //keeps track of row
+    for (int j = 0; j < boardRowSize; j++){ //keeps track of column
+            if (board[k]==1){ //if alive
+                if (countLiveNeighbor(*board, boardRowSize, boardColSize, i, j)!=2 && countLiveNeighbor(*board, boardRowSize, boardColSize, i, j)!=3  ){
+                    board[k] = 0;
+                }
+            }
+            if (board[k]==0){ //if dead
+                if (countLiveNeighbor(*board, boardRowSize, boardColSize, i, j)==3){ //if dead cell has exactly three neighbors
+                    board[k] = 1;
+                }
+            }
+        k++; //move to next cell
+        }
+    }
+
+
+return *board; //return updated board
+}
+
+
+
+
+
+/*
+ * aliveStable
+ * Checks if the alive cells stay the same for next step
+ * board: 1-D array of the current game board. 1 represents a live cell.
+ * 0 represents a dead cell
+ * boardRowSize: the number of rows on the game board.
+ * boardColSize: the number of cols on the game board.
+ * Output: return 1 if the alive cells for next step is exactly the same with
+ * current step or there is no alive cells at all.
+ * return 0 if the alive cells change for the next step.
+ */
+int aliveStable(int* board, int boardRowSize, int boardColSize){
+//perhaps try to use & to and the two arrays together (current and next)
+//if the anded result is equivalent to the current, then the alive cells are the same
+//if this is the case, return 1
+int* added = *board & updateBoard(*board, boardRowSize, boardColSize);
+int stable = 0;
+if (*added == *board){
+    stable = 1;
+}
+return stable;
+}
+
+
+
+
+
