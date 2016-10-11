@@ -3,7 +3,7 @@
  shung5
  ece220
  mp6
- version 0.0
+ version 0.6
 
 
 
@@ -22,9 +22,11 @@
  */
 
 int countLiveNeighbor(int* board, int boardRowSize, int boardColSize, int row, int col){
-int endindex = boardRowSize * boardColSize - 1; //remember that rows and column indexes start at 0
+int rowsize = boardRowSize;
+int colsize = boardColSize;
+int endindex = rowsize * colsize - 1; //remember that rows and column indexes start at 0
 int totalalive = 0;
-int currentpos = row * boardColSize + col;
+int currentpos = row * colsize + col;
 int north, south, east, west, northeast, northwest, southeast, southwest; //these are the eight possible neighbors
 
 //check north buddy
@@ -42,7 +44,7 @@ if (south <= endindex){ //this must be true in order for us to check the followi
     }
 }
 //check east buddy
-east = currentpos + 1
+east = currentpos + 1;
 if (east <= endindex){
     if (currentpos%rowsize != (rowsize-1) && board[east] == 1){ //check to see if the current cell is a right edge cell
         totalalive++;
@@ -99,19 +101,22 @@ return totalalive;
  * boardColSize: the number of cols on the game board.
  * Output: board is updated with new values for next step.
  */
-void updateBoard(int* board, int boardRowSize, int boardColSize) {
-int i, j;
+int updateBoard(int* board, int boardRowSize, int boardColSize) {
+int i = 0;
+int j = 0;
 int k = 0;
-
-for (int i = 0; i < boardColSize; i++){ //keeps track of row
-    for (int j = 0; j < boardRowSize; j++){ //keeps track of column
+int rowsize = boardRowSize;
+int colsize = boardColSize;
+int liveneighbors = countLiveNeighbor(*board, rowsize, colsize, i, j);
+for (i = 0; i < colsize; i++){ //keeps track of row
+    for (j = 0; j < rowsize; j++){ //keeps track of column
             if (board[k]==1){ //if alive
-                if (countLiveNeighbor(*board, boardRowSize, boardColSize, i, j)!=2 && countLiveNeighbor(*board, boardRowSize, boardColSize, i, j)!=3  ){
+                if (liveneighbors!=2 && liveneighbors!=3  ){
                     board[k] = 0;
                 }
             }
             if (board[k]==0){ //if dead
-                if (countLiveNeighbor(*board, boardRowSize, boardColSize, i, j)==3){ //if dead cell has exactly three neighbors
+                if (liveneighbors==3){ //if dead cell has exactly three neighbors
                     board[k] = 1;
                 }
             }
@@ -142,9 +147,12 @@ int aliveStable(int* board, int boardRowSize, int boardColSize){
 //perhaps try to use & to and the two arrays together (current and next)
 //if the anded result is equivalent to the current, then the alive cells are the same
 //if this is the case, return 1
-int* added = *board & updateBoard(*board, boardRowSize, boardColSize);
+int rowsize = boardRowSize;
+int colsize = boardColSize;
+int added = 0;
+added = *board & updateBoard(*board, rowsize, colsize);
 int stable = 0;
-if (*added == *board){
+if (added == *board){
     stable = 1;
 }
 return stable;
