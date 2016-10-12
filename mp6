@@ -3,9 +3,14 @@
  shung5
  ece220
  mp6
- version 0.6
+ version 1.1
 
-
+This program has three functions.  The first one takes the number of active neighbors for each cell.
+This number is then used to determine whether the current cell should stay alive or die (if alive)
+, or resurrect or stay dead (if dead)
+It then updates the board.
+The last function essentially checks if there are any disparities between the previous board and the updated board.
+If there is nothing different or if all of the cells are dead, the game terminates.
 
 
  countLiveNeighbor
@@ -30,14 +35,14 @@ int currentpos = row * colsize + col;
 int north, south, east, west, northeast, northwest, southeast, southwest; //these are the eight possible neighbors
 
 //check north buddy
-north = currentpos - rowsize;
+north = currentpos - colsize;
 if (north >= 0){ //check to see if north neighbor exists
     if (board[north]==1){
         totalalive++;
     }
 }
 //check south buddy
-south = currentpos + rowsize;
+south = currentpos + colsize;
 if (south <= endindex){ //this must be true in order for us to check the following conditional
     if (board[south]==1){ //above must be true in order for this case
         totalalive++;
@@ -46,43 +51,43 @@ if (south <= endindex){ //this must be true in order for us to check the followi
 //check east buddy
 east = currentpos + 1;
 if (east <= endindex){
-    if (currentpos%rowsize != (rowsize-1) && board[east] == 1){ //check to see if the current cell is a right edge cell
+    if (currentpos%colsize != (colsize-1) && board[east] == 1){ //check to see if the current cell is a right edge cell
         totalalive++;
          }
 }
 //check west buddy
 west = currentpos - 1;
 if (west >= 0){
-    if (currentpos%rowsize!=0 && board[west]==1){ //check to see if the current cell is left edge cell
+    if (currentpos%colsize!=0 && board[west]==1){ //check to see if the current cell is left edge cell
         totalalive++;
             }
 }
 //check northeast buddy
-northeast = currentpos - (rowsize -1);
+northeast = currentpos - (colsize -1);
 if (northeast >= 0){ //if in range
-    if (currentpos%rowsize!=(rowsize - 1) && board[northeast]==1){ //check to see if right edge cell
+    if (currentpos%colsize!=(colsize - 1) && board[northeast]==1){ //check to see if right edge cell
             totalalive++;
         }
 }
 //check northwest buddy
-northwest = currentpos - (rowsize + 1);
+northwest = currentpos - (colsize + 1);
 if (northwest >= 0){
-    if (currentpos%rowsize!=0 && board[northwest]==1){
+    if (currentpos%colsize!=0 && board[northwest]==1){
             totalalive++;
         }
     }
 //check southeast buddy
-southeast = currentpos + (rowsize + 1);
+southeast = currentpos + (colsize + 1);
 if (southeast <= endindex){
-    if (currentpos%rowsize != (rowsize - 1) && board[southeast]==1){ //check for right edge cell
+    if (currentpos%colsize != (colsize - 1) && board[southeast]==1){ //check for right edge cell
            totalalive++;
         }
 
 }
 //check southwest buddy
-southwest = currentpos + (rowsize-1);
+southwest = currentpos + (colsize-1);
 if (southwest <= endindex){
-    if (currentpos%rowsize!=0 && board[southwest]==1){
+    if (currentpos%colsize!=0 && board[southwest]==1){
             totalalive++;
         }
     }
@@ -101,31 +106,38 @@ return totalalive;
  * boardColSize: the number of cols on the game board.
  * Output: board is updated with new values for next step.
  */
-int updateBoard(int* board, int boardRowSize, int boardColSize) {
+void updateBoard(int* board, int boardRowSize, int boardColSize) {
 int i = 0;
 int j = 0;
 int k = 0;
 int rowsize = boardRowSize;
 int colsize = boardColSize;
-int liveneighbors = countLiveNeighbor(*board, rowsize, colsize, i, j);
-for (i = 0; i < colsize; i++){ //keeps track of row
-    for (j = 0; j < rowsize; j++){ //keeps track of column
-            if (board[k]==1){ //if alive
-                if (liveneighbors!=2 && liveneighbors!=3  ){
-                    board[k] = 0;
+int temp_board[boardRowSize*boardColSize];
+for(k=0;k<boardRowSize*boardColSize;++k) {
+    temp_board[k] = board[k];
+} //temp is created in order to preserve board while we update values remotely on temp
+int liveneighbors=0;
+for (i = 0; i < rowsize; i++){ //keeps track of row
+    for (j = 0; j < colsize; j++){ //keeps track of column
+            liveneighbors = countLiveNeighbor(board, rowsize, colsize, i, j);
+            if (board[i*colsize+j]==1){ //if alive
+                if (liveneighbors!=2 && liveneighbors!=3  ){ //dead condition
+                    temp_board[i*colsize+j] = 0;
                 }
             }
-            if (board[k]==0){ //if dead
+            if (board[i*colsize+j]==0){ //if dead
                 if (liveneighbors==3){ //if dead cell has exactly three neighbors
-                    board[k] = 1;
+                    temp_board[i*colsize+j] = 1;
                 }
             }
-        k++; //move to next cell
+
         }
-    }
+    }  //temp now has all the updated values
+for(k=0;k<boardRowSize*boardColSize;++k) {
+    board[k] = temp_board[k];
+}  //time to give these values back to board
 
-
-return *board; //return updated board
+//since function is a void, no need to return anything
 }
 
 
@@ -144,18 +156,28 @@ return *board; //return updated board
  * return 0 if the alive cells change for the next step.
  */
 int aliveStable(int* board, int boardRowSize, int boardColSize){
-//perhaps try to use & to and the two arrays together (current and next)
-//if the anded result is equivalent to the current, then the alive cells are the same
-//if this is the case, return 1
-int rowsize = boardRowSize;
-int colsize = boardColSize;
-int added = 0;
-added = *board & updateBoard(*board, rowsize, colsize);
-int stable = 0;
-if (added == *board){
-    stable = 1;
+
+
+
+
+int k, notthesame = 0;
+int temp_board[boardRowSize*boardColSize];
+
+for(k=0;k<boardRowSize*boardColSize;k++) {
+    temp_board[k] = board[k];
 }
-return stable;
+updateBoard(temp_board,boardRowSize, boardColSize);
+for(k=0;k<boardRowSize*boardColSize;k++) {
+    if(board[k]!=temp_board[k]) {
+        notthesame = 1;
+        break;
+    }
+}
+return same;
+
+
+
+
 }
 
 
