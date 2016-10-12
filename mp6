@@ -3,7 +3,7 @@
  shung5
  ece220
  mp6
- version 1.1
+ version 1.1.1
 
 This program has three functions.  The first one takes the number of active neighbors for each cell.
 This number is then used to determine whether the current cell should stay alive or die (if alive)
@@ -160,7 +160,7 @@ int aliveStable(int* board, int boardRowSize, int boardColSize){
 
 
 
-int k, notthesame = 0;
+int k, same = 1;
 int temp_board[boardRowSize*boardColSize];
 
 for(k=0;k<boardRowSize*boardColSize;k++) {
@@ -169,7 +169,7 @@ for(k=0;k<boardRowSize*boardColSize;k++) {
 updateBoard(temp_board,boardRowSize, boardColSize);
 for(k=0;k<boardRowSize*boardColSize;k++) {
     if(board[k]!=temp_board[k]) {
-        notthesame = 1;
+        same = 0;
         break;
     }
 }
