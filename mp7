@@ -3,7 +3,7 @@
 //shung5
 //ece220
 //mp7_sudoku
-//version 0.0
+//version 0.1
 
 //this program is essentially the logic part of the sudoku puzzle
 //this piece of code will recursively find the solution to a given input
@@ -46,21 +46,21 @@ int is_val_in_row(const int val, const int i, const int sudoku[9][9]) { //sudoku
   assert(i>=0 && i<9); // i = row
 
   // BEG TODO
-int valid = 1;
+int invalid = 0;
 int cur_val = val;
 int cur_pos; //this tells us where in the row we are
 for (cur_pos = 0; cur_pos < 9; cur_pos++)
 {
     if (cur_val == sudoku[i][cur_pos])
     {
-        valid = 0;
+        invalid = 1;
         break;
     }
 
 }
 
 
-  return valid;
+  return invalid;
   // END TODO
 }
 
@@ -71,19 +71,19 @@ int is_val_in_col(const int val, const int j, const int sudoku[9][9]) {
   assert(j>=0 && j<9); //j = column
 
   // BEG TODO
-int valid = 1;
+int invalid = 0;
 int cur_val = val;
 int cur_pos; //this tells us where in the row we are
 for (cur_pos = 0; cur_pos < 9; cur_pos++)
 {
     if (cur_val == sudoku[cur_pos][j])
     {
-        valid = 0;
+        invalid = 1;
         break;
     }
 
 }
-  return 0;
+  return invalid;
   // END TODO
 }
 
@@ -96,7 +96,7 @@ int is_val_in_3x3_zone(const int val, const int i, const int j, const int sudoku
   // BEG TODO
  //9 ifs, one for each square area -- inequalities to determine which area
   //within each if, we will use for loops
-int valid = 1;
+int invalid = 0;
 int cur_val = val;
 int cur_pos;
 int m; //keeps track of row -- corresponds to i
@@ -104,7 +104,7 @@ int n; //keeps track of column -- corresponds to j
 // 1 2 3
 // 4 5 6
 // 7 8 9
-if (i=>0 && i <= 2 && j >= 0 && j <= 2) //if in section 1 (above diagram)
+if (i>=0 && i <= 2 && j >= 0 && j <= 2) //if in section 1 (above diagram)
 {
     for (m = 0; m <= 2 ; m++)
     {
@@ -112,13 +112,13 @@ if (i=>0 && i <= 2 && j >= 0 && j <= 2) //if in section 1 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>0 && i <= 2 && j >= 3 && j <= 5) //if in section 2 (above diagram)
+if (i>=0 && i <= 2 && j >= 3 && j <= 5) //if in section 2 (above diagram)
 {
      for (m = 0; m <= 2 ; m++)
     {
@@ -126,13 +126,13 @@ if (i=>0 && i <= 2 && j >= 3 && j <= 5) //if in section 2 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>0 && i <= 2 && j >= 6 && j <= 8) //if in section 3 (above diagram)
+if (i>=0 && i <= 2 && j >= 6 && j <= 8) //if in section 3 (above diagram)
 {
      for (m = 0; m <= 2 ; m++)
     {
@@ -140,13 +140,13 @@ if (i=>0 && i <= 2 && j >= 6 && j <= 8) //if in section 3 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>3 && i <= 5 && j >= 0 && j <= 2) //if in section 4 (above diagram)
+if (i>=3 && i <= 5 && j >= 0 && j <= 2) //if in section 4 (above diagram)
 {
      for (m = 3; m <= 5 ; m++)
     {
@@ -154,13 +154,13 @@ if (i=>3 && i <= 5 && j >= 0 && j <= 2) //if in section 4 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>3 && i <= 5 && j >= 3 && j <= 5) //if in section 5 (above diagram)
+if (i>=3 && i <= 5 && j >= 3 && j <= 5) //if in section 5 (above diagram)
 {
       for (m = 3; m <= 5 ; m++)
     {
@@ -168,13 +168,13 @@ if (i=>3 && i <= 5 && j >= 3 && j <= 5) //if in section 5 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>3 && i <= 5 && j >= 6 && j <= 8) //if in section 6 (above diagram)
+if (i>=3 && i <= 5 && j >= 6 && j <= 8) //if in section 6 (above diagram)
 {
      for (m = 3; m <= 5 ; m++)
     {
@@ -182,13 +182,13 @@ if (i=>3 && i <= 5 && j >= 6 && j <= 8) //if in section 6 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>6 && i <= 8 && j >= 0 && j <= 2) //if in section 7 (above diagram)
+if (i>=6 && i <= 8 && j >= 0 && j <= 2) //if in section 7 (above diagram)
 {
      for (m = 6; m <= 8 ; m++)
     {
@@ -196,13 +196,13 @@ if (i=>6 && i <= 8 && j >= 0 && j <= 2) //if in section 7 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>6 && i <= 8 && j >= 3 && j <= 5) //if in section 8 (above diagram)
+if (i>=6 && i <= 8 && j >= 3 && j <= 5) //if in section 8 (above diagram)
 {
      for (m = 6; m <= 8 ; m++)
     {
@@ -210,13 +210,13 @@ if (i=>6 && i <= 8 && j >= 3 && j <= 5) //if in section 8 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-if (i=>6 && i <= 8 && j >= 6 && j <= 8) //if in section 9 (above diagram)
+if (i>=6 && i <= 8 && j >= 6 && j <= 8) //if in section 9 (above diagram)
 {
      for (m = 6; m <= 8 ; m++)
     {
@@ -224,13 +224,13 @@ if (i=>6 && i <= 8 && j >= 6 && j <= 8) //if in section 9 (above diagram)
         {
             if (cur_val == sudoku[m][n])
             {
-                valid = 0;
+                invalid = 1;
                 break;
             }
         }
     }
 }
-  return valid;
+  return invalid;
   // END TODO
 }
 
