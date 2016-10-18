@@ -3,7 +3,7 @@
 //shung5
 //ece220
 //mp7_sudoku
-//version 0.52
+//version 0.53
 
 //this program is essentially the logic part of the sudoku puzzle
 //this piece of code will recursively find the solution to a given input
@@ -267,7 +267,6 @@ int b = 0;
   {
   return 1; //returning true should terminate the program
   }
-
 
 if (check_full!=0) //empty cell exists
 {
