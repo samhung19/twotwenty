@@ -3,7 +3,7 @@
 //shung5
 //ece220
 //mp7_sudoku
-//version 0.1
+//version 0.52
 
 //this program is essentially the logic part of the sudoku puzzle
 //this piece of code will recursively find the solution to a given input
@@ -56,10 +56,7 @@ for (cur_pos = 0; cur_pos < 9; cur_pos++)
         invalid = 1;
         break;
     }
-
 }
-
-
   return invalid;
   // END TODO
 }
@@ -81,7 +78,6 @@ for (cur_pos = 0; cur_pos < 9; cur_pos++)
         invalid = 1;
         break;
     }
-
 }
   return invalid;
   // END TODO
@@ -249,10 +245,60 @@ int solve_sudoku(int sudoku[9][9]) {
 
   // BEG TODO.
 
+int x,y;
+int check_full=0; //if the board is full, this value will be zero
+int num = 1; //this will range from 1 to 9, essentially this is what we plug into the board
+int m = 0;
+int n = 0;
+int a = 0;
+int b = 0;
 
-  return 0;
-  // END TODO.
+  for (x = 0; x<9; x++) //base case: board is completely filled with values
+  {
+      for (y = 0; y<9; y++)
+      {
+        if (sudoku[x][y]==0)
+        {
+        check_full++;        //if an empty cell exists, check_full will be nonzero
+        }
+      }
+  }
+  if (check_full==0) //if the board is full
+  {
+  return 1; //returning true should terminate the program
+  }
+
+
+if (check_full!=0) //empty cell exists
+{
+    for (m = 0; m<9; m++) //check for empty cell
+  {
+      for (n = 0; n<9; n++)
+      {
+        if (sudoku[m][n]==0)
+        {
+        a = m;
+        b = n;
+        break;
+        }
+      }
+  }
 }
 
+for (num = 1; num <= 9; num++)
+{
+    if (is_val_valid(num,a,b,sudoku)==1)
+    {
+        sudoku[a][b]==num;
+        if (solve_sudoku(sudoku) == 1)
+        {
+            return 1;
+        }
+        sudoku[a][b]=0;
+    }
+}
+ return 0;
+  // END TODO.
+}
 
 
