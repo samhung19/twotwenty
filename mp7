@@ -3,7 +3,7 @@
 //shung5
 //ece220
 //mp7_sudoku
-//version 0.53
+//version 0.54
 
 //this program is essentially the logic part of the sudoku puzzle
 //this piece of code will recursively find the solution to a given input
@@ -252,6 +252,7 @@ int m = 0;
 int n = 0;
 int a = 0;
 int b = 0;
+int done = 0;
 
   for (x = 0; x<9; x++) //base case: board is completely filled with values
   {
@@ -278,9 +279,11 @@ if (check_full!=0) //empty cell exists
         {
         a = m;
         b = n;
+        done = 1;
         break;
         }
       }
+      if(done==1) break;
   }
 }
 
@@ -288,7 +291,7 @@ for (num = 1; num <= 9; num++)
 {
     if (is_val_valid(num,a,b,sudoku)==1)
     {
-        sudoku[a][b]==num;
+        sudoku[a][b]=num;
         if (solve_sudoku(sudoku) == 1)
         {
             return 1;
