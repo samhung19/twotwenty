@@ -2,7 +2,7 @@
 //shung5
 //ece220
 //mp8
-//version 0.11
+//version 0.12
 //this program basically creates a new game (resets/initializes variables)
 //then, it will generate random number blocks
 //game takes user input and certain keys will "swipe" this blocks in a certain direction
@@ -183,16 +183,25 @@ int move_s(game * cur_game) //slide down
     //YOUR CODE STARTS HERE
 int rows = cur_game->rows;
 int cols = cur_game->cols;
-int i, j, target_row;
+int i, j, k, target_row;
+int temp_board;
+int valid = 0;
+
+
+for (k = 0; k < rows*cols; k++) //use this to check for valid move
+{
+    temp_board[k] = cur_game[k];
+}
+
 for (j = 0; j< cols; j++)
 {
-	target_row = 0;
+	target_row = rows-1;
 	for (i = rows-2; i>=0; i--)
 	{
 		if (cur_game[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[target_row*cols+j] != -1 && target_row<i)
+			while(cur_game[target_row*cols+j] != -1 && target_row>i)
 			{
 			target_row--; //target becomes the row with the first empty cell
 			}
@@ -205,19 +214,197 @@ for (j = 0; j< cols; j++)
 		}
 
 	}
-} //end of getting rid of the empty cells, adding like terms below
-    return 1;
+} //end of getting rid of the empty cells
+//now check for change
+for (k = 0; k < cols*rows; k++)
+{
+    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    {
+        valid = 1;
+        break;
+    }
+}
+//the adding like terms begins below
+for (j = 0; j < cols; j++)
+{
+    for (i = rows-2; i >0; i--)
+    {
+        if (cur_game[i*cols+j] == cur_game[(i-1)*cols+j] && cur_game[i*cols+j]%2 == 0 && cur_game[(i-1)*cols+j]%2==0)
+        {
+            cur_game[i*cols+j] = (2 * cur_game[i*cols+j]) + 1; //double and add one
+            cur_game[(i-1)*cols+j] = -1;
+            i--; //this is to skip the index containing empty (-1)
+        }
+    }
+} //end of adding like terms
+for (j = 0; j< cols; j++)
+{
+	target_row = rows-1;
+	for (i = rows-2; i>=0; i--)
+	{
+		if (cur_game[i*cols+j] != -1)
+		{
+		//find first available empty cell
+			while(cur_game[target_row*cols+j] != -1 && target_row>i)
+			{
+			target_row--; //target becomes the row with the first empty cell
+			}
+			if (target_row > i)
+			{
+			cur_game[target_row*cols+j] = cur_game[i*cols+j];
+			cur_game[i*cols+j]=-1;
+			}
+
+		}
+
+	}
+} //end of getting rid of the empty cells
+ //now all we need to do now is to revert the odd sum to even
+
+for (k = 0; k < rows*cols; k++)
+{
+    if (cur_game[k]%2==1 && cur_game[k]>0)
+    {
+        cur_game[k]=cur_game[k]-1; //for example, 5 becomes 4 and is now a valid number
+    }
+}
+
+    return valid;
 };
 
 int move_a(game * cur_game) //slide left
 {
     //YOUR CODE STARTS HERE
+int rows = cur_game->rows;
+int cols = cur_game->cols;
+int i, j, k, target_col;
+int temp_board;
+int valid = 0;
 
-    return 1;
+
+for (k = 0; k < rows*cols; k++) //use this to check for valid move
+{
+    temp_board[k] = cur_game[k];
+}
+for (i = 0; i< rows; i++)
+{
+	target_col = 0;
+	for (j =1; j<cols; j++)
+	{
+		if (cur_game[i*cols+j] != -1)
+		{
+		//find first available empty cell
+			while(cur_game[i*cols+target_col] != -1 && target_col<j)
+			{
+			target_col++; //target becomes the row with the first empty cell
+			}
+			if (target_col < j)
+			{
+			cur_game[i*cols+target_col] = cur_game[i*cols+j];
+			cur_game[i*cols+j]=-1;
+			}
+
+		}
+
+	}
+} //end of getting rid of the empty cells
+//check to see if there was change at all
+
+for (k = 0; k < cols*rows; k++)
+{
+    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    {
+        valid = 1;
+        break;
+    }
+}
+
+//the adding like terms begins below
+for (i = 0; i < rows; i++)
+{
+    for (j = 0; j < cols - 1; j++)
+    {
+        if (cur_game[i*cols+j] == cur_game[i*cols+(j+1)] && cur_game[i*cols+j]%2 == 0 && cur_game[i*cols+(j+1)]%2==0)
+        {
+            cur_game[i*cols+j] = (2 * cur_game[i*cols+j]) + 1; //double and add one
+            cur_game[i*cols+(j+1)] = -1;
+            j++; //this is to skip the index containing empty (-1)
+        }
+    }
+} //end of adding like terms
+for (i = 0; i< rows; i++)
+{
+	target_col = 0;
+	for (j =1; j<cols; j++)
+	{
+		if (cur_game[i*cols+j] != -1)
+		{
+		//find first available empty cell
+			while(cur_game[i*cols+target_col] != -1 && target_col<j)
+			{
+			target_col++; //target becomes the row with the first empty cell
+			}
+			if (target_col < j)
+			{
+			cur_game[i*cols+target_col] = cur_game[i*cols+j];
+			cur_game[i*cols+j]=-1;
+			}
+
+		}
+
+	}
+} //end of getting rid of the empty cells
+ //now all we need to do now is to revert the odd sum to even
+
+for (k = 0; k < rows*cols; k++)
+{
+    if (cur_game[k]%2==1 && cur_game[k]>0)
+    {
+        cur_game[k]=cur_game[k]-1; //for example, 5 becomes 4 and is now a valid number
+    }
+}
+
+    return valid;
 };
 
 int move_d(game * cur_game){ //slide to the right
     //YOUR CODE STARTS HERE
+int rows = cur_game->rows;
+int cols = cur_game->cols;
+int i, j, k, target_row;
+int temp_board;
+int valid = 0;
+
+
+for (k = 0; k < rows*cols; k++) //use this to check for valid move
+{
+    temp_board[k] = cur_game[k];
+}
+for (i = 0; i< rows; i++)
+{
+	target_col = cols-1;
+	for (j =cols-2; j>0; j--)
+	{
+		if (cur_game[i*cols+j] != -1)
+		{
+		//find first available empty cell
+			while(cur_game[i*cols+target_col] != -1 && target_col<j)
+			{
+			target_col++; //target becomes the row with the first empty cell
+			}
+			if (target_col < j)
+			{
+			cur_game[i*cols+target_col] = cur_game[i*cols+j];
+			cur_game[i*cols+j]=-1;
+			}
+
+		}
+
+	}
+} //end of getting rid of the empty cells
+
+
+
 
     return 1;
 };
