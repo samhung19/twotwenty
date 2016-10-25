@@ -2,7 +2,7 @@
 //shung5
 //ece220
 //mp8
-//version 0.0
+//version 0.1
 //this program basically creates a new game (resets/initializes variables)
 //then, it will generate random number blocks
 //game takes user input and certain keys will "swipe" this blocks in a certain direction
@@ -87,6 +87,8 @@ int rows = cur_game->rows;
 int cols = cur_game->cols;
 int i, j, k, target_row;
 int temp_board;
+int valid = 0;
+
 
 for (k = 0; k < rows*cols; k++) //use this to check for valid move
 {
@@ -114,6 +116,17 @@ for (j = 0; j< cols; j++)
 
 	}
 } //end of getting rid of the empty cells
+//check to see if there was change at all
+
+for (k = 0; k < cols*rows; k++)
+{
+    if (my_array[k]!=temp_board[k]) //if anything has changed, then move is valid
+    {
+        valid = 1;
+        break;
+    }
+}
+
 //the adding like terms begins below
 for (j = 0; j < cols; j++)
 {
@@ -160,11 +173,10 @@ for (k = 0; k < rows*cols; k++)
     }
 }
 
-
-
-
-    return 1;
+    return valid;
 };
+
+
 
 int move_s(game * cur_game) //slide down
 {
