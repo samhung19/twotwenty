@@ -2,7 +2,7 @@
 //shung5
 //ece220
 //mp8
-//version 0.31
+//version 0.5
 //this program basically creates a new game (resets/initializes variables)
 //then, it will generate random number blocks
 //game takes user input and certain keys will "swipe" this blocks in a certain direction
@@ -22,13 +22,13 @@ game * make_game(int rows, int cols)
     mygame->cells = malloc(rows*cols*sizeof(cell));
 
     //YOUR CODE STARTS HERE:  Initialize all other variables in game struct
-    game.rows = rows;
-    game.cols = cols;
-    game.score = 0;
+    mygame->rows = rows;
+    mygame->cols = cols;
+    mygame->score = 0;
     int i;
     for (i = 0; i < rows*cols; i++)
     {
-       cell * cells[i] = -1;
+       mygame-> cell * cells[i] = -1;
 
     }
 
@@ -48,13 +48,13 @@ void remake_game(game ** _cur_game_ptr,int new_rows,int new_cols)
 	(*_cur_game_ptr)->cells = malloc(new_rows*new_cols*sizeof(cell));
 
 	 //YOUR CODE STARTS HERE:  Re-initialize all other variables in game struct
-    game.rows = new_rows;
-    game.cols = new_cols;
-    game.score = 0;
+    mygame->rows = new_rows;
+    mygame->cols = new_cols;
+    mygame->score = 0;
     int i;
     for (i = 0; i < new_rows*new_cols; i++)
     {
-       cell * cells[i] = -1;
+       mygame->cell * cells[i] = -1;
 
     }
 	return;
@@ -100,30 +100,30 @@ int move_w(game * cur_game)
 int rows = cur_game->rows;
 int cols = cur_game->cols;
 int i, j, k, target_row;
-int temp_board;
+int temp_board[rows*cols];
 int valid = 0;
 
 
 for (k = 0; k < rows*cols; k++) //use this to check for valid move
 {
-    temp_board[k] = cur_game[k];
+    temp_board[k] = mygame->cells[k];
 }
 for (j = 0; j< cols; j++)
 {
 	target_row = 0;
 	for (i =1; i<rows; i++)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[target_row*cols+j] != -1 && target_row<i)
+			while(mygame->cells[target_row*cols+j] != -1 && target_row<i)
 			{
 			target_row++; //target becomes the row with the first empty cell
 			}
 			if (target_row < i)
 			{
-			cur_game[target_row*cols+j] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[target_row*cols+j] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -134,7 +134,7 @@ for (j = 0; j< cols; j++)
 
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
@@ -150,11 +150,11 @@ for (j = 0; j < cols; j++)
 {
     for (i = 0; i < rows - 1; i++)
     {
-        if (cur_game[i*cols+j] == cur_game[(i+1)*cols+j] && cur_game[i*cols+j]%2 == 0 && cur_game[(i+1)*cols+j]%2==0)
+        if (mygame->cells[i*cols+j] == mygame->cells[(i+1)*cols+j] && mygame->cells[i*cols+j]%2 == 0 && mygame->cells[(i+1)*cols+j]%2==0)
         {
-            cur_game[i*cols+j] = (2 * cur_game[i*cols+j]) + 1; //double and add one
-            game.score += (2 * cur_game[i*cols+j]);
-            cur_game[(i+1)*cols+j] = -1;
+            mygame->cells[i*cols+j] = (2 * mygame->cells[i*cols+j]) + 1; //double and add one
+            mygame->score += (2 * mygame->cells[i*cols+j]);
+            mygame->cells[(i+1)*cols+j] = -1;
             i++; //this is to skip the index containing empty (-1)
         }
     }
@@ -165,17 +165,17 @@ for (j = 0; j< cols; j++)
 	target_row = 0;
 	for (i =1; i<rows; i++)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[target_row*cols+j] != -1 && target_row<i)
+			while(mygame->cells[target_row*cols+j] != -1 && target_row<i)
 			{
 			target_row++; //target becomes the row with the first empty cell
 			}
 			if (target_row < i)
 			{
-			cur_game[target_row*cols+j] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[target_row*cols+j] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -186,16 +186,16 @@ for (j = 0; j< cols; j++)
 
 for (k = 0; k < rows*cols; k++)
 {
-    if (cur_game[k]%2==1 && cur_game[k]>0)
+    if (mygame->cells[k]%2==1 && mygame->cells[k]>0)
     {
-        cur_game[k]=cur_game[k]-1; //for example, 5 becomes 4 and is now a valid number
+        mygame->cells[k]=mygame->cells[k]-1; //for example, 5 becomes 4 and is now a valid number
     }
 }
 //check to see if there was change at all
 
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
@@ -217,13 +217,13 @@ int move_s(game * cur_game) //slide down
 int rows = cur_game->rows;
 int cols = cur_game->cols;
 int i, j, k, target_row;
-int temp_board;
+int temp_board[rows*cols];
 int valid = 0;
 
 
 for (k = 0; k < rows*cols; k++) //use this to check for valid move
 {
-    temp_board[k] = cur_game[k];
+    temp_board[k] = mygame->cells[k];
 }
 
 for (j = 0; j< cols; j++)
@@ -231,17 +231,17 @@ for (j = 0; j< cols; j++)
 	target_row = rows-1;
 	for (i = rows-2; i>=0; i--)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[target_row*cols+j] != -1 && target_row>i)
+			while(mygame->cells[target_row*cols+j] != -1 && target_row>i)
 			{
 			target_row--; //target becomes the row with the first empty cell
 			}
 			if (target_row > i)
 			{
-			cur_game[target_row*cols+j] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[target_row*cols+j] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -251,7 +251,7 @@ for (j = 0; j< cols; j++)
 //now check for change
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
@@ -266,11 +266,11 @@ for (j = 0; j < cols; j++)
 {
     for (i = rows-2; i >0; i--)
     {
-        if (cur_game[i*cols+j] == cur_game[(i-1)*cols+j] && cur_game[i*cols+j]%2 == 0 && cur_game[(i-1)*cols+j]%2==0)
+        if (mygame->cells[i*cols+j] == mygame->cells[(i-1)*cols+j] && mygame->cells[i*cols+j]%2 == 0 && mygame->cells[(i-1)*cols+j]%2==0)
         {
-            cur_game[i*cols+j] = (2 * cur_game[i*cols+j]) + 1; //double and add one
-            game.score += (2 * cur_game[i*cols+j]);
-            cur_game[(i-1)*cols+j] = -1;
+            mygame->cells[i*cols+j] = (2 * mygame->cells[i*cols+j]) + 1; //double and add one
+            mygame->score += (2 * mygame->cells[i*cols+j]);
+            mygame->cells[(i-1)*cols+j] = -1;
             i--; //this is to skip the index containing empty (-1)
         }
     }
@@ -280,17 +280,17 @@ for (j = 0; j< cols; j++)
 	target_row = rows-1;
 	for (i = rows-2; i>=0; i--)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[target_row*cols+j] != -1 && target_row>i)
+			while(mygame->cells[target_row*cols+j] != -1 && target_row>i)
 			{
 			target_row--; //target becomes the row with the first empty cell
 			}
 			if (target_row > i)
 			{
-			cur_game[target_row*cols+j] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[target_row*cols+j] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -301,16 +301,16 @@ for (j = 0; j< cols; j++)
 
 for (k = 0; k < rows*cols; k++)
 {
-    if (cur_game[k]%2==1 && cur_game[k]>0)
+    if (mygame->cells[k]%2==1 && mygame->cells[k]>0)
     {
-        cur_game[k]=cur_game[k]-1; //for example, 5 becomes 4 and is now a valid number
+        mygame->cells[k]=mygame->cells[k]-1; //for example, 5 becomes 4 and is now a valid number
     }
 }
 //check to see if there was change at all
 
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
@@ -330,30 +330,30 @@ int move_a(game * cur_game) //slide left
 int rows = cur_game->rows;
 int cols = cur_game->cols;
 int i, j, k, target_col;
-int temp_board;
+int temp_board[rows*cols];
 int valid = 0;
 
 
 for (k = 0; k < rows*cols; k++) //use this to check for valid move
 {
-    temp_board[k] = cur_game[k];
+    temp_board[k] = mygame->cells[k];
 }
 for (i = 0; i< rows; i++)
 {
 	target_col = 0;
 	for (j =1; j<cols; j++)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[i*cols+target_col] != -1 && target_col<j)
+			while(mygame->cells[i*cols+target_col] != -1 && target_col<j)
 			{
 			target_col++; //target becomes the row with the first empty cell
 			}
 			if (target_col < j)
 			{
-			cur_game[i*cols+target_col] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[i*cols+target_col] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -364,7 +364,7 @@ for (i = 0; i< rows; i++)
 
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
@@ -379,11 +379,11 @@ for (i = 0; i < rows; i++)
 {
     for (j = 0; j < cols - 1; j++)
     {
-        if (cur_game[i*cols+j] == cur_game[i*cols+(j+1)] && cur_game[i*cols+j]%2 == 0 && cur_game[i*cols+(j+1)]%2==0)
+        if (mygame->cells[i*cols+j] == mygame->cells[i*cols+(j+1)] && mygame->cells[i*cols+j]%2 == 0 && mygame->cells[i*cols+(j+1)]%2==0)
         {
-            cur_game[i*cols+j] = (2 * cur_game[i*cols+j]) + 1; //double and add one
-            game.score += (2 * cur_game[i*cols+j]);
-            cur_game[i*cols+(j+1)] = -1;
+            mygame->cells[i*cols+j] = (2 * mygame->cells[i*cols+j]) + 1; //double and add one
+            mygame->score += (2 * mygame->cells[i*cols+j]);
+            mygame->cells[i*cols+(j+1)] = -1;
             j++; //this is to skip the index containing empty (-1)
         }
     }
@@ -393,17 +393,17 @@ for (i = 0; i< rows; i++)
 	target_col = 0;
 	for (j =1; j<cols; j++)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[i*cols+target_col] != -1 && target_col<j)
+			while(mygame->cells[i*cols+target_col] != -1 && target_col<j)
 			{
 			target_col++; //target becomes the row with the first empty cell
 			}
 			if (target_col < j)
 			{
-			cur_game[i*cols+target_col] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[i*cols+target_col] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -414,16 +414,16 @@ for (i = 0; i< rows; i++)
 
 for (k = 0; k < rows*cols; k++)
 {
-    if (cur_game[k]%2==1 && cur_game[k]>0)
+    if (mygame->cells[k]%2==1 && mygame->cells[k]>0)
     {
-        cur_game[k]=cur_game[k]-1; //for example, 5 becomes 4 and is now a valid number
+        mygame->cells[k]=mygame->cells[k]-1; //for example, 5 becomes 4 and is now a valid number
     }
 }
 //check to see if there was change at all
 
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
@@ -440,31 +440,31 @@ int move_d(game * cur_game){ //slide to the right
     //YOUR CODE STARTS HERE
 int rows = cur_game->rows;
 int cols = cur_game->cols;
-int i, j, k, target_row;
-int temp_board;
+int i, j, k, target_col;
+int temp_board[rows*cols];
 int valid = 0;
 
 
 for (k = 0; k < rows*cols; k++) //use this to check for valid move
 {
-    temp_board[k] = cur_game[k];
+    temp_board[k] = mygame->cells[k];
 }
 for (i = 0; i< rows; i++)
 {
 	target_col = cols-1;
 	for (j =cols-2; j>0; j--)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[i*cols+target_col] != -1 && target_col>j)
+			while(mygame->cells[i*cols+target_col] != -1 && target_col>j)
 			{
 			target_col--; //target becomes the row with the first empty cell
 			}
 			if (target_col > j)
 			{
-			cur_game[i*cols+target_col] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[i*cols+target_col] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -474,7 +474,7 @@ for (i = 0; i< rows; i++)
 //now check for change
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
@@ -489,11 +489,11 @@ for (i = 0; i < rows; i++)
 {
     for (j = cols-2; j >0; j--)
     {
-        if (cur_game[i*cols+j] == cur_game[i*cols+(j-1)] && cur_game[i*cols+j]%2 == 0 && cur_game[i*cols+(j-1)]%2==0)
+        if (mygame->cells[i*cols+j] == mygame->cells[i*cols+(j-1)] && mygame->cells[i*cols+j]%2 == 0 && mygame->cells[i*cols+(j-1)]%2==0)
         {
-            cur_game[i*cols+j] = (2 * cur_game[i*cols+j]) + 1; //double and add one
-            game.score += (2 * cur_game[i*cols+j]);
-            cur_game[i*cols+(j-1)] = -1;
+            mygame->cells[i*cols+j] = (2 * mygame->cells[i*cols+j]) + 1; //double and add one
+            mygame->score += (2 * mygame->cells[i*cols+j]);
+            mygame->cells[i*cols+(j-1)] = -1;
             j--; //this is to skip the index containing empty (-1)
         }
     }
@@ -503,17 +503,17 @@ for (i = 0; i< rows; i++)
 	target_col = cols-1;
 	for (j =cols-2; j>0; j--)
 	{
-		if (cur_game[i*cols+j] != -1)
+		if (mygame->cells[i*cols+j] != -1)
 		{
 		//find first available empty cell
-			while(cur_game[i*cols+target_col] != -1 && target_col>j)
+			while(mygame->cells[i*cols+target_col] != -1 && target_col>j)
 			{
 			target_col--; //target becomes the row with the first empty cell
 			}
 			if (target_col > j)
 			{
-			cur_game[i*cols+target_col] = cur_game[i*cols+j];
-			cur_game[i*cols+j]=-1;
+			mygame->cells[i*cols+target_col] = mygame->cells[i*cols+j];
+			mygame->cells[i*cols+j]=-1;
 			}
 
 		}
@@ -524,16 +524,16 @@ for (i = 0; i< rows; i++)
 
 for (k = 0; k < rows*cols; k++)
 {
-    if (cur_game[k]%2==1 && cur_game[k]>0)
+    if (mygame->cells[k]%2==1 && mygame->cells[k]>0)
     {
-        cur_game[k]=cur_game[k]-1; //for example, 5 becomes 4 and is now a valid number
+        mygame->cells[k]=mygame->cells[k]-1; //for example, 5 becomes 4 and is now a valid number
     }
 }
 //check to see if there was change at all
 
 for (k = 0; k < cols*rows; k++)
 {
-    if (cur_game[k]!=temp_board[k]) //if anything has changed, then move is valid
+    if (mygame->cells[k]!=temp_board[k]) //if anything has changed, then move is valid
     {
         valid = 1;
         break;
