@@ -2,7 +2,7 @@
 //shung5
 //ece220
 //mp8
-//version 0.3
+//version 0.31
 //this program basically creates a new game (resets/initializes variables)
 //then, it will generate random number blocks
 //game takes user input and certain keys will "swipe" this blocks in a certain direction
@@ -28,7 +28,7 @@ game * make_game(int rows, int cols)
     int i;
     for (i = 0; i < rows*cols; i++)
     {
-       cell * cells = -1;
+       cell * cells[i] = -1;
 
     }
 
@@ -48,7 +48,15 @@ void remake_game(game ** _cur_game_ptr,int new_rows,int new_cols)
 	(*_cur_game_ptr)->cells = malloc(new_rows*new_cols*sizeof(cell));
 
 	 //YOUR CODE STARTS HERE:  Re-initialize all other variables in game struct
+    game.rows = new_rows;
+    game.cols = new_cols;
+    game.score = 0;
+    int i;
+    for (i = 0; i < new_rows*new_cols; i++)
+    {
+       cell * cells[i] = -1;
 
+    }
 	return;
 }
 
@@ -70,8 +78,14 @@ cell * get_cell(game * cur_game, int row, int col)
 */
 {
     //YOUR CODE STARTS HERE
+int index = (game.cols*row) + col;
+if (row>=game.rows || col>=game.cols ) //to stay in bounds
+{
+      return NULL;
+}
+return cell->cells-1;
 
-    return NULL;
+
 }
 
 int move_w(game * cur_game)
@@ -540,8 +554,24 @@ int legal_move_check(game * cur_game)
  */
 {
     //YOUR CODE STARTS HERE
-
-    return 1;
+    int valid = 0;
+    if (move_w()==1)
+    {
+       valid = 1;
+    }
+    if (move_s()==1)
+    {
+        valid = 1;
+    }
+    if (move_a()==1)
+    {
+        valid = 1;
+    }
+    if (move_d()==1)
+    {
+        valid = 1;
+    }
+    return valid;
 }
 
 
