@@ -4,7 +4,7 @@
 //shung5
 //ece220
 //mp9_maze
-//version 0.21
+//version 0.22
 //This program basically consists of functions that create a maze board by allocating memory for cells
 //then, walls/empty_space are placed within each cell (board is a 2D array)
 //using manhattan algorithm, recursively find solution (a way out of the maze)
@@ -28,11 +28,15 @@ maze_t * createMaze(char * fileName)
     {
         return 0;
     }
-   fscanf(in_file, "%d %d", &h, &w);
+   fscanf(in_file, "%d %d", &w, &h);
     maze_t* maze = (maze_t*)malloc(sizeof(maze_t));
     maze->width = w;
     maze->height = h;
-    maze->cells = (char**)malloc(sizeof(char));
+    maze->cells = (char**)malloc(h*sizeof(char));
+    for (i = 0; i< h; i++)
+    {
+        maze->cells[i]=(char*)malloc(w*sizeof(char));
+    }
     for (i = 0; i < h; i++)
     {
         for (j = 0; j < w; j++)
