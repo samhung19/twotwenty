@@ -4,7 +4,7 @@
 //shung5
 //ece220
 //mp9_maze
-//version 0.22
+//version 0.3
 //This program basically consists of functions that create a maze board by allocating memory for cells
 //then, walls/empty_space are placed within each cell (board is a 2D array)
 //using manhattan algorithm, recursively find solution (a way out of the maze)
@@ -21,18 +21,19 @@ maze_t * createMaze(char * fileName)
 {
     // Your code here. Make sure to replace following line with your own code.
    FILE *in_file;
-   int w, h;
+   int w, h, space;
    int i, j;
+   char c;
    in_file = fopen(fileName, "r");
      if (in_file == NULL)
     {
         return 0;
     }
-   fscanf(in_file, "%d %d", &w, &h);
+   fscanf(in_file, "%d %d %d", &h, &w, &space);
     maze_t* maze = (maze_t*)malloc(sizeof(maze_t));
     maze->width = w;
     maze->height = h;
-    maze->cells = (char**)malloc(h*sizeof(char));
+    maze->cells = (char**)malloc(h*sizeof(char*));
     for (i = 0; i< h; i++)
     {
         maze->cells[i]=(char*)malloc(w*sizeof(char));
@@ -41,8 +42,10 @@ maze_t * createMaze(char * fileName)
     {
         for (j = 0; j < w; j++)
         {
-            fscanf(in_file,"%c",&maze->cells[h][w]);
-        }
+            fscanf(in_file,"%c",&maze->cells[i][j]);
+	    //c = getc(in_file);
+	    //maze->cells[i][j] = c;       
+	}
     }
      for (i = 0; i < h; i++)
     {
@@ -99,18 +102,23 @@ void destroyMaze(maze_t * maze)
 void printMaze(maze_t * maze)
 {
     // Your code here.
-    int rows = maze->height;
-    int cols = maze->width;
+    char c;
+    int rows, cols;
+    rows = maze->height;
+    cols = maze->width;
     int i, j;
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
         {
-            if (j!=cols-1)
-            printf("%c",maze->cells[i][j]);
-            if (j==cols-1)
-            printf("%c\n",maze->cells[i][j]);
+            c = (maze->cells)[i][j];
+	    if (c == '\n')
+            continue;
+	    else
+            printf("%c",c);
+
         }
+	printf("\n");
     }
 }
 
@@ -127,9 +135,10 @@ int solveMazeManhattanDFS(maze_t * maze, int col, int row)
 {
     // Your code here. Make sure to replace following line with your own code.
 int left_dist, right_dist, above_dist, below_dist;
-int i,j,end_row,end_col;
-int done = 0;
-for (i = 0; i<row; i++)
+//int i,j;
+int end_row, end_col;
+//int done = 0;
+/*for (i = 0; i<row; i++)
 {
     for (j = 0; j <col; j++)
     {
@@ -142,8 +151,9 @@ for (i = 0; i<row; i++)
         }
     }
     if (done == 1) break;
-} //result: we get the specific location of the endpoint, which will be used in the manhattan distance equation
-
+} //result: we get the specific location of the endpoint, which will be used in the manhattan distance equation  */
+end_row = maze->endRow;
+end_col = maze->endColumn;
 if (maze->cells[row][col]!=EMPTY || row < 0 || col <0 || row >= maze->height || col >= maze->width) //if not an empty cell or out of bounds
     return 0;
 if (row==end_row && col == end_col) //base case - if the location equals END location -- we are done
