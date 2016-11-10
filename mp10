@@ -1,0 +1,404 @@
+#include "sparsemat.h"
+#include <stdio.h>
+#include <stdlib.h>
+//shung5
+//ece220
+//mp10
+//version 0.22
+//this program gets a list of tuples
+//it receives the data and translates it, ordering and filtering it
+//it can also be operated upon (addition/multiplication)
+
+
+sp_tuples * load_tuples(char* input_file)
+{
+    int rows, cols, row, col, i, j;
+    int nonzero = 0;
+    double val;
+    FILE *in_file;
+    in_file = fopen(input_file, "r");
+    if (in_file == NULL)
+    {
+        return 0;
+    }
+    fscanf(in_file, "%d %d", &rows, &cols);
+    sp_tuples* mat = malloc(sizeof(sp_tuples));
+    mat->m=rows;
+    mat->n=cols;
+    mat->tuples_head = NULL;
+    sp_tuples_node* head = mat->tuples_head;
+    sp_tuples_node* curr = NULL;
+    while (fscanf(in_file,"%d %d %lf", &row, &col, &val) != EOF)
+    {
+
+        if (mat->tuples_head!=NULL) //add in the nodes
+        {
+            //sp_tuples_node* head = mat->tuples_head;
+            //sp_tuples_node* curr = NULL;
+            while (head!=NULL)
+            {
+                if (head->next==NULL && val!=0) //if last node and valid
+                {
+                        sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
+						add->row = row;
+						add->col = col;
+						add->value =val;
+						head->next = add;
+						add->next = NULL;
+						nonzero++;
+                }
+                else if (head->row==row && head->col==col) //matching coord
+                {
+                        if (head->value == 0) //value is zero, get rid of this node
+                        {
+                            curr->next=head->next;
+                            free(head); //get rid of this
+                            head=curr->next;
+                            nonzero--;
+                            break;
+                        }
+                        else //valid value
+                        {
+                        head->value=val; //assign val
+						break;
+                        }
+
+                }
+                else if (row*cols+col < (head->row)*cols + (head->col) && val!=0) //if before current location
+                {
+                        if(curr == NULL) //first node not yet created
+                        {
+							sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
+							mat->tuples_head = add;
+							add->row = row;
+							add->col = col;
+							add->value = val;
+							add->next = head;
+                        }
+						else
+						{
+							sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+							curr->next = add;
+							add->row = row;
+							add->col = col;
+							add->value = val;
+							add->next = head;
+						}
+						nonzero++;
+						break;
+                }
+
+            }
+
+        }
+        else //if we have empty list
+        {
+            sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
+            add->row=row;
+            add->col=col;
+            add->value=val;
+            add->next=NULL;
+            nonzero++;
+            mat->tuples_head = add; //assign new head
+        }
+    curr = head;
+    if(head->next!=NULL)
+    head = head->next; //increment -- move on to next node
+
+    }
+
+    fclose(in_file);
+    return mat;
+
+}
+
+
+
+
+double gv_tuples(sp_tuples * mat_t,int row,int col)
+
+{
+int val = 0;
+sp_tuples_node* head = mat_t->tuples_head;
+	while(head!=NULL)
+    {
+		//conditional to see if the index matches
+		if(head->row==row && head->col == col)
+        {
+				val = head->value;
+				break;
+        }
+		head = head->next;
+	}
+	return val;
+
+}
+
+
+
+void set_tuples(sp_tuples * mat_t, int row, int col, double value)
+{
+    if (mat_t->tuples_head == NULL) //if empty
+    {
+        sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+		add->row = row;
+		add->col = col;
+		add->value = value;
+		add->next = NULL;
+		mat_t->nz++;
+		mat_t->tuples_head = add;
+
+    }
+    else
+    {
+        sp_tuples_node * head = mat_t->tuples_head;
+		sp_tuples_node * curr = NULL;
+        while (head!=NULL)
+        {
+            if (head->row == row && head->col ==col)
+            {
+                if (head->value == 0)
+                {
+                curr->next = head->next;
+                free(head);
+                head=curr->next;
+                mat_t->nz--;
+                break;
+                }
+                else //if value is nonzero & therefore valid
+                {
+                    head->value = value;
+                    break;
+                }
+            }
+            else if (row*2+col < (head->row)*2+(head->col) && value!=0) //use 2 because # of cols is the same for both lists
+            {
+                if (curr == NULL)
+                {
+						sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+						mat_t->tuples_head = add;
+						add->row = row;
+						add->col = col;
+						add->value = value;
+						add->next = head;
+                }
+                else
+                {
+						sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+						curr->next = add;
+						add->row = row;
+						add->col = col;
+						add->value = value;
+						add->next = head;
+                }
+                    mat_t->nz++;
+					break;
+            }
+            else if (head->next == NULL && value != 0) //reaching end of list
+            {
+					sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+					head->next = add;
+					add->row = row;
+					add->col = col;
+					add->value =value;
+					add->next = NULL;
+					mat_t->nz++;
+            }
+            curr = head;
+            head = head->next;
+        }
+    }
+
+    return;
+}
+
+
+
+void save_tuples(char * file_name, sp_tuples * mat_t)
+{
+	FILE *write;
+	write = fopen(file_name, "w");
+		if(write == NULL)
+			return 0;
+	sp_tuples_node * head = mat_t->tuples_head;
+	fprintf(write, "%d %d\n", mat_t->m, mat_t->n);
+	while(head!=NULL)
+    {
+		fprintf(write, "%d %d %lf\n", head->row, head->col, head->value);
+		head = head->next;
+	}
+}
+
+
+
+sp_tuples * add_tuples(sp_tuples * matA, sp_tuples * matB){
+
+if (matA->m != matB->m || matA->n != matB->n) //invalid
+    return 0;
+
+int m = matA->m;
+int n = matA->n;
+sp_tuples * matC = malloc(sizeof(sp_tuples));
+matC->m = m;
+matC->n = n;
+matC->tuples_head = NULL;
+matC->nz = 0;
+
+sp_tuples_node * headA = matA->tuples_head;  //we will traverse matA and matB
+sp_tuples_node * currA = NULL;
+sp_tuples_node * headB = matB->tuples_head;
+sp_tuples_node * currB = NULL;
+sp_tuples_node * headC = matC->tuples_head;
+sp_tuples_node * currC = NULL;
+
+while (headA != NULL)
+{
+    set_tuples(matC, headA->row, headA->col, headA->value);
+    currA = headA;
+    headA = headA->next;
+}
+while (headB != NULL)
+{
+    if ( (headB->row)*(matA->n)+(headB->col)<(headC->row)*(matA->n)+(headC->col) ) //if B is before C
+    {
+        if (currC == NULL) //first node
+        {
+        sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
+        matC->tuples_head = add;
+        add->row = headB->row;
+        add->col = headB->col;
+        add->value = headB->value;
+        add->next = headC;
+        matC->nz++;
+        currB = headB;
+        headB = headB->next;
+        currC = add;
+        continue;
+        }
+        else
+        {
+        sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
+        currC->next = add;
+        add->row = headB->row;
+		add->col = headB->col;
+		add->value = headB->value;
+		add->next = headC;
+		matC->nz++;
+        currB = headB;
+        headB = headB->next;
+        currC = add;
+        continue;
+        }
+    }
+    else if ( (headB->row)*(matA->n)+(headB->col) == (headC->row)*(matA->n)+(headC->col) )
+    {
+    headC->value+=headB->value; //add the B part to C
+    currB = headB;
+    headB = headB->next;
+    currC = headC;
+    headC = headC->next;
+    continue;
+    }
+    else if (headC->next == NULL) //we reach the end of the list
+    {
+    sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
+    add->row = headB->row;
+	add->col = headB->col;
+	add->value = headB->value;
+	add->next = NULL;
+	headC->next = add;
+    currB = headB;
+    headB = headB->next;
+    currC = headC;
+    headC = add;
+    continue;
+    }
+		currC = headC;
+		headC = headC->next;
+}
+	return matC;
+}
+
+
+
+sp_tuples * mult_tuples(sp_tuples * matA, sp_tuples * matB){
+    sp_tuples * matC = malloc(sizeof(sp_tuples));
+    if(matA->n!=matB->m)
+        return 0;
+    matC->m = matA->m;
+	matC->n = matB->n;
+	matC->nz = 0;
+	matC->tuples_head = NULL;
+	int set = 0;  //check to see if we need to add or set, 0 for set and 1 for add
+    sp_tuples_node * headA = matA->tuples_head;
+    sp_tuples_node * currA = NULL;
+    sp_tuples_node * headB = matB->tuples_head;
+    sp_tuples_node * currB = NULL;
+    sp_tuples_node * headC = matC->tuples_head;
+    sp_tuples_node * currC = NULL;
+while (headA != NULL)
+{
+    while (headB != NULL)
+    {
+        if (headA->col == headB->row)
+        {
+            while (headC != NULL)
+            {
+                if (headC->row==headA->row && headC->col==headB->col)
+                {
+                    (headC->value)+=((headA->value)*(headB->value));
+                    set = 1;
+                    break;
+                }
+            currC=headC;
+            headC=headC->next;
+            }
+        if (set == 0)
+        set_tuples(matC, headA->row, headB->col, headA->value*headB->value);
+        }
+	currB = headB;
+	headB = headB->next;
+    }
+ 	currA = headA;
+	headA = headA->next;
+}
+    return matC;
+
+}
+
+
+
+void destroy_tuples(sp_tuples * mat_t){
+
+    //sp_tuples* temp;
+    //while(mat_t !=NULL)
+    //{
+    //temp = mat_t;
+    //mat_t = mat_t->next;
+    //free(mat_t);
+    //}
+
+    sp_tuples_node ** temp = malloc(sizeof(sp_tuples_node)*mat_t->nz);
+    sp_tuples_node * head = mat_t->tuples_head;
+    int i,index = 0;
+    while (head!=NULL && head->next!=NULL)
+    {
+        temp[index] = head;
+        head = head->next;
+        index++;
+    }
+    for (i = 0; i <=index; i++)
+    {
+        free(temp[i]);
+    }
+    free(mat_t);
+    free(temp);
+
+    return;
+}
+
+
+
+
+
+
