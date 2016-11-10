@@ -1,10 +1,11 @@
+
 #include "sparsemat.h"
 #include <stdio.h>
 #include <stdlib.h>
 //shung5
 //ece220
 //mp10
-//version 0.22
+//version 0.3
 //this program gets a list of tuples
 //it receives the data and translates it, ordering and filtering it
 //it can also be operated upon (addition/multiplication)
@@ -26,58 +27,75 @@ sp_tuples * load_tuples(char* input_file)
     mat->m=rows;
     mat->n=cols;
     mat->tuples_head = NULL;
-    sp_tuples_node* head = mat->tuples_head;
-    sp_tuples_node* curr = NULL;
-    while (fscanf(in_file,"%d %d %lf", &row, &col, &val) != EOF)
+    //sp_tuples_node* head = mat->tuples_head;
+    //sp_tuples_node* curr = NULL;
+    	while(fscanf(in_file, "%d %d %lf", &row, &col, &val) != EOF)
     {
-
-        if (mat->tuples_head!=NULL) //add in the nodes
-        {
-            //sp_tuples_node* head = mat->tuples_head;
-            //sp_tuples_node* curr = NULL;
-            while (head!=NULL)
+		//first case: our list is empty
+		if(mat->tuples_head == NULL)
+		{
+			//malloc a new node
+			sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+			//assign the values from the file
+			add->row = row;
+			add->col = col;
+			add->value = val;
+			add->next = NULL;
+			//bump up nonzero
+			nonzero++;
+			//this is now the head
+			mat->tuples_head = add;
+		}
+		else
             {
-                if (head->next==NULL && val!=0) //if last node and valid
-                {
-                        sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
-						add->row = row;
-						add->col = col;
-						add->value =val;
-						head->next = add;
-						add->next = NULL;
-						nonzero++;
-                }
-                else if (head->row==row && head->col==col) //matching coord
-                {
-                        if (head->value == 0) //value is zero, get rid of this node
-                        {
-                            curr->next=head->next;
-                            free(head); //get rid of this
-                            head=curr->next;
-                            nonzero--;
-                            break;
-                        }
-                        else //valid value
-                        {
-                        head->value=val; //assign val
+			//otherwise, we need to traverse the linked list with a head and a curr
+			sp_tuples_node * head = mat->tuples_head;
+			sp_tuples_node * curr = NULL;
+			while(head!=NULL)
+			{
+				//case 1: the index is equal
+				if(head->row==row&&head->col==col)
+				{
+					//reassign the value if 0
+					if(head->value!=0)
+					{
+						head->value=val;
 						break;
-                        }
-
-                }
-                else if (row*cols+col < (head->row)*cols + (head->col) && val!=0) //if before current location
+					//otherwise delete the node
+					}
+                    else
+                    {
+						//assign the following node to the previous node, skipping this one
+						curr->next=head->next;
+						//now free the node we're at
+						free(head);
+						head=curr->next;
+						nonzero--;
+						break;
+					}
+				//case 2: the index is before where we are now
+				}
+				else if((row<head->row)||(row==head->row&&col<head->col))
                 {
-                        if(curr == NULL) //first node not yet created
-                        {
-							sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
+					//make sure the val is not 0; if so, skip this
+					if(val!=0)
+					{
+						//case 2a: we are at the first node
+						if(curr == NULL)
+						{
+							sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+							//set head to this new node
 							mat->tuples_head = add;
 							add->row = row;
 							add->col = col;
 							add->value = val;
 							add->next = head;
-                        }
-						else
-						{
+						//case 2b: we are not at the first node
+						}
+                        else
+                        {
 							sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+							//set prv pointer to this new node
 							curr->next = add;
 							add->row = row;
 							add->col = col;
@@ -86,28 +104,32 @@ sp_tuples * load_tuples(char* input_file)
 						}
 						nonzero++;
 						break;
-                }
+					}
+				//case 3: we've reached the end, so just append a new node
+				}
+				else if(head->next == NULL)
+                {
+					if(val!=0)
+					{
+						sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+						head->next = add;
+						add->row = row;
+						add->col = col;
+						add->value =val;
+						add->next = NULL;
+						nonzero++;
+					}
+				}
+				//increment logic
+				//set curr to head, set head to the next node in list
+				curr = head;
+				head = head->next;
+			}
+		}
+	}
 
-            }
-
-        }
-        else //if we have empty list
-        {
-            sp_tuples_node* add = malloc(sizeof(sp_tuples_node));
-            add->row=row;
-            add->col=col;
-            add->value=val;
-            add->next=NULL;
-            nonzero++;
-            mat->tuples_head = add; //assign new head
-        }
-    curr = head;
-    if(head->next!=NULL)
-    head = head->next; //increment -- move on to next node
-
-    }
-
-    fclose(in_file);
+    //fclose(in_file);
+    mat->nz = nonzero;
     return mat;
 
 }
@@ -257,6 +279,8 @@ while (headA != NULL)
     currA = headA;
     headA = headA->next;
 }
+headC = matC->tuples_head;
+currC = NULL;
 while (headB != NULL)
 {
     if ( (headB->row)*(matA->n)+(headB->col)<(headC->row)*(matA->n)+(headC->col) ) //if B is before C
@@ -338,6 +362,7 @@ sp_tuples * mult_tuples(sp_tuples * matA, sp_tuples * matB){
     sp_tuples_node * currC = NULL;
 while (headA != NULL)
 {
+
     while (headB != NULL)
     {
         if (headA->col == headB->row)
@@ -370,29 +395,14 @@ while (headA != NULL)
 
 void destroy_tuples(sp_tuples * mat_t){
 
-    //sp_tuples* temp;
-    //while(mat_t !=NULL)
-    //{
-    //temp = mat_t;
-    //mat_t = mat_t->next;
-    //free(mat_t);
-    //}
-
-    sp_tuples_node ** temp = malloc(sizeof(sp_tuples_node)*mat_t->nz);
-    sp_tuples_node * head = mat_t->tuples_head;
-    int i,index = 0;
-    while (head!=NULL && head->next!=NULL)
-    {
-        temp[index] = head;
-        head = head->next;
-        index++;
-    }
-    for (i = 0; i <=index; i++)
-    {
-        free(temp[i]);
-    }
-    free(mat_t);
-    free(temp);
+if(mat_t!=NULL)
+   {
+     if((mat_t)->tuples_head!=NULL)
+     {
+       free((mat_t)->tuples_head);
+     }
+      free(mat_t);
+   }
 
     return;
 }
