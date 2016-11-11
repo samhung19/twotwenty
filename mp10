@@ -31,71 +31,45 @@ sp_tuples * load_tuples(char* input_file)
     //sp_tuples_node* curr = NULL;
     	while(fscanf(in_file, "%d %d %lf", &row, &col, &val) != EOF)
     {
-		//first case: our list is empty
-		if(mat->tuples_head == NULL)
-		{
-			//malloc a new node
-			sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
-			//assign the values from the file
-			add->row = row;
-			add->col = col;
-			add->value = val;
-			add->next = NULL;
-			//bump up nonzero
-			nonzero++;
-			//this is now the head
-			mat->tuples_head = add;
-		}
-		else
-            {
-			//otherwise, we need to traverse the linked list with a head and a curr
+
+		if (mat->tuples_head!=NULL)
+        {
 			sp_tuples_node * head = mat->tuples_head;
 			sp_tuples_node * curr = NULL;
 			while(head!=NULL)
 			{
-				//case 1: the index is equal
-				if(head->row==row&&head->col==col)
+				if(head->row==row&&head->col==col) //index match
 				{
-					//reassign the value if 0
 					if(head->value!=0)
 					{
 						head->value=val;
 						break;
-					//otherwise delete the node
 					}
                     else
                     {
-						//assign the following node to the previous node, skipping this one
-						curr->next=head->next;
-						//now free the node we're at
+						curr->next=head->next; //delete node
 						free(head);
 						head=curr->next;
 						nonzero--;
 						break;
 					}
-				//case 2: the index is before where we are now
 				}
-				else if((row<head->row)||(row==head->row&&col<head->col))
+				else if(row*cols+col < (head->row)*cols + (head->col)) //index is before current
                 {
-					//make sure the val is not 0; if so, skip this
 					if(val!=0)
 					{
-						//case 2a: we are at the first node
 						if(curr == NULL)
 						{
 							sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
-							//set head to this new node
 							mat->tuples_head = add;
 							add->row = row;
 							add->col = col;
 							add->value = val;
 							add->next = head;
-						//case 2b: we are not at the first node
 						}
                         else
                         {
 							sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
-							//set prv pointer to this new node
 							curr->next = add;
 							add->row = row;
 							add->col = col;
@@ -105,9 +79,8 @@ sp_tuples * load_tuples(char* input_file)
 						nonzero++;
 						break;
 					}
-				//case 3: we've reached the end, so just append a new node
 				}
-				else if(head->next == NULL)
+				else if(head->next == NULL) //get rid of seg fault
                 {
 					if(val!=0)
 					{
@@ -120,12 +93,21 @@ sp_tuples * load_tuples(char* input_file)
 						nonzero++;
 					}
 				}
-				//increment logic
-				//set curr to head, set head to the next node in list
 				curr = head;
 				head = head->next;
 			}
 		}
+        else //empty list
+		{
+			sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+			add->col = col;
+			add->row = row;
+			add->value = val;
+			add->next = NULL;
+			nonzero++;
+            mat->tuples_head = add; //new head
+		}
+
 	}
 
     //fclose(in_file);
@@ -133,9 +115,6 @@ sp_tuples * load_tuples(char* input_file)
     return mat;
 
 }
-
-
-
 
 double gv_tuples(sp_tuples * mat_t,int row,int col)
 
