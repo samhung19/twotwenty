@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 //shung5
+//nlao2
 //ece220
 //mp10
-//version 0.5
+//version 0.6
 //this program gets a list of tuples
 //it receives the data and translates it, ordering and filtering it
 //it can also be operated upon (addition/multiplication)
@@ -27,8 +28,7 @@ sp_tuples * load_tuples(char* input_file)
     mat->m=rows;
     mat->n=cols;
     mat->tuples_head = NULL;
-    //sp_tuples_node* head = mat->tuples_head;
-    //sp_tuples_node* curr = NULL;
+
     	while(fscanf(in_file, "%d %d %lf", &row, &col, &val) != EOF)
     {
 
@@ -50,33 +50,26 @@ sp_tuples * load_tuples(char* input_file)
 						curr->next=head->next; //delete node
 						free(head);
 						head=curr->next;
-						nonzero--;
+						nonzero--; //decrement nonzero count
 						break;
 					}
 				}
 				else if(row*cols+col < (head->row)*cols + (head->col)) //index is before current
-                {
+                {  //use 2d to 1d index formula^^
 					if(val!=0)
 					{
 
-                        if (curr != NULL)
-                        {
-							sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
-							curr->next = add;
-							add->row = row;
-							add->col = col;
-							add->value = val;
-							add->next = head;
-						}
+                        sp_tuples_node * add = malloc(sizeof(sp_tuples_node)); //create new node
+                        if (curr != NULL) //so basically the list is not empty
+                            curr->next = add;  //allocate data
+
 						else
-						{
-							sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
 							mat->tuples_head = add;
-							add->row = row;
-							add->col = col;
-							add->value = val;
-							add->next = head;
-						}
+
+                        add->row = row;
+                        add->col = col;
+						add->value = val;
+						add->next = head;
 
 						nonzero++;
 						break;
@@ -129,7 +122,7 @@ if (mat_t == NULL)
 
 int val = 0;
 sp_tuples_node* head = mat_t->tuples_head;
-	while(head!=NULL)
+	while(head!=NULL) //traverse list
     {
 		//conditional to see if the index matches
 		if(head->row==row && head->col == col)
@@ -152,16 +145,20 @@ void set_tuples(sp_tuples * mat_t, int row, int col, double value)
     {
         sp_tuples_node * head = mat_t->tuples_head;
 		sp_tuples_node * curr = NULL;
+		//int r;
+		int c;
+		//r = mat_t->m;
+		c = mat_t->n;
         while (head!=NULL)
         {
             if (head->row == row && head->col ==col)
             {
                 if (head->value == 0)
                 {
+                mat_t->nz--;
                 curr->next = head->next;
                 free(head);
                 head=curr->next;
-                mat_t->nz--;
                 break;
                 }
                 else //if value is nonzero & therefore valid
@@ -170,27 +167,20 @@ void set_tuples(sp_tuples * mat_t, int row, int col, double value)
                     break;
                 }
             }
-            else if (row*2+col < (head->row)*2+(head->col) && value!=0) //use 2 because # of cols is the same for both lists
+            else if (row*c+col < (head->row)*c+(head->col) && value!=0)
             {
-                if (curr == NULL)
-                {
-						sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
-						mat_t->tuples_head = add;
-						add->row = row;
-						add->col = col;
-						add->value = value;
-						add->next = head;
-                }
-                else
-                {
-						sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+                sp_tuples_node * add = malloc(sizeof(sp_tuples_node));
+                 if (curr != NULL)
 						curr->next = add;
-						add->row = row;
-						add->col = col;
-						add->value = value;
-						add->next = head;
-                }
-                    mat_t->nz++;
+
+                 else
+                	mat_t->tuples_head = add;
+
+                add->row = row;
+				add->col = col;
+				add->value = value;
+				add->next = head;
+                mat_t->nz++;
 					break;
             }
             else if (head->next == NULL && value != 0) //reaching end of list
@@ -230,11 +220,18 @@ void save_tuples(char * file_name, sp_tuples * mat_t)
 	write = fopen(file_name, "w");
 		if(write == NULL)
 			return;
-	sp_tuples_node * head = mat_t->tuples_head;
-	fprintf(write, "%d %d\n", mat_t->m, mat_t->n);
+    int rows, cols;
+    rows = mat_t->m;
+    cols = mat_t->n;
+    //double val;
+    sp_tuples_node * head = mat_t->tuples_head;
+	fprintf(write, "%d %d\n", rows,cols);
 	while(head!=NULL)
     {
-		fprintf(write, "%d %d %lf\n", head->row, head->col, head->value);
+       // row = head->row;
+       // col = head->col;
+       // val = head->value;
+		fprintf(write, "%d %d %lf\n", head->row,head->col,head->value);
 		head = head->next;
 	}
 }
@@ -336,14 +333,13 @@ sp_tuples * mult_tuples(sp_tuples * matA, sp_tuples * matB){
 	matC->tuples_head = NULL;
 	int set = 0;  //check to see if we need to add or set, 0 for set and 1 for add
     sp_tuples_node * headA = matA->tuples_head;
-    sp_tuples_node * headB = matB->tuples_head;
-    sp_tuples_node * headC = matC->tuples_head;
 
 while (headA != NULL)
 {
-
+    sp_tuples_node * headB = matB->tuples_head;
     while (headB != NULL)
     {
+    sp_tuples_node * headC = matC->tuples_head;
         if (headA->col == headB->row)
         {
             while (headC != NULL)
@@ -371,14 +367,15 @@ while (headA != NULL)
 
 void destroy_tuples(sp_tuples * mat_t){
 
-if(mat_t!=NULL)
+if(mat_t!=NULL) //if whole thing is gone
    {
-     if((mat_t)->tuples_head!=NULL)
+     if((mat_t)->tuples_head!=NULL) //if head is gone
      {
-       free((mat_t)->tuples_head);
+       free((mat_t)->tuples_head); //free all the heads
      }
-      free(mat_t);
+      free(mat_t); //free list
    }
+
 
     return;
 }
